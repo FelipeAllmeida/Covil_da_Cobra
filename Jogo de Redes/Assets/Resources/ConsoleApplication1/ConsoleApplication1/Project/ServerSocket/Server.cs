@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using SimpleJSON;
-using System.IO.Ports;
 
 
 class Server
