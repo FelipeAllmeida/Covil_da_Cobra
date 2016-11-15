@@ -30,8 +30,8 @@ public class TCPConnector
     #endregion
 
     #region Const Data
-    private const string _socketResourcesPath = "Resources/ConsoleApplication1/ConsoleApplication1/bin/ConsoleApplication1.exe";
-    private const string _socketParametersFilePath = "Resources/ConsoleApplication1/ConsoleApplication1/bin";
+    private const string _socketResourcesPath = @"Resources/ConsoleApplication1/ConsoleApplication1/bin/Debug/ConsoleApplication1.exe";
+    private const string _socketParametersFilePath = @"Resources/ConsoleApplication1/ConsoleApplication1/bin/Debug/SocketParameters.txt";
     #endregion
 
     //Tenta iniciar a conexão e cria o socket se necessário
@@ -77,16 +77,8 @@ public class TCPConnector
             __process.StartInfo.CreateNoWindow = false;
             __process.StartInfo.UseShellExecute = false;
 
-            string[] __dataPathArray = Application.dataPath.Split('/');
-            string __fullPath = string.Empty;
-
-            for (int i = 0;i < __dataPathArray.Length;i++)
-            {
-                if (__dataPathArray[i] != "Assets")
-                    __fullPath += __dataPathArray[i] + "/";
-            }
-            __process.StartInfo.FileName = @"" +__fullPath + _socketResourcesPath;
-            UnityEngine.Debug.Log(__fullPath + _socketResourcesPath);
+            string __fullPath = Application.dataPath + "/" + _socketResourcesPath;
+            __process.StartInfo.FileName = __fullPath;
             try
             {
                 __process.Start();
@@ -110,17 +102,8 @@ public class TCPConnector
         __socketInitializeParameters.ipAddress = p_ipAddress;
         __socketInitializeParameters.port = p_port;
         __socketInitializeParameters.turnTime = p_turnTime;
-
-        string[] __dataPathArray = Application.dataPath.Split('/');
-        string __fullPath = string.Empty;
-
-        for (int i = 0;i < __dataPathArray.Length;i++)
-        {
-            if (__dataPathArray[i] != "Assets")
-                __fullPath += __dataPathArray[i] + "/";
-        }
-        __fullPath += _socketParametersFilePath;
-
+        
+        string __fullPath = Application.dataPath + "/" +  _socketParametersFilePath;
         File.WriteAllText(__fullPath, JsonUtility.ToJson(__socketInitializeParameters));
         if (p_callbackFinish != null)
             p_callbackFinish();
