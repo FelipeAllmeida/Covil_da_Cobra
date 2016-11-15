@@ -7,6 +7,7 @@ class SocketInitializationData
 {
     public string ipAddress;
     public int port;
+    public int maxClients;
     public float turnTime;
 }
 

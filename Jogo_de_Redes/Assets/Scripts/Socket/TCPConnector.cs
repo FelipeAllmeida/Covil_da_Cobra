@@ -18,13 +18,11 @@ public class TCPConnector
     private StreamWriter _streamWriter;
     private StreamReader _streamReader;
 
-    private string _hostIpAddress;
-    private int _port;
-
     private struct SocketInitializeParameters
     {
         public string ipAddress;
         public int port;
+        public int maxClients;
         public float turnTime;
     }
     #endregion
@@ -34,21 +32,39 @@ public class TCPConnector
     private const string _socketParametersFilePath = @"Resources/ConsoleApplication1/ConsoleApplication1/bin/Debug/SocketParameters.txt";
     #endregion
 
-    //Tenta iniciar a conexão e cria o socket se necessário
-    public void SetupSocket(string p_ipAddress, int p_port, float p_turnTime, bool p_openSocket, Action p_callbackSuccess, Action p_callbackFailed)
+    //Tenta iniciar a conexão
+    public void SetupSocket(string p_ipAddress, int p_port, Action p_callbackSuccess, Action p_callbackFailed)
     {
-        _hostIpAddress = p_ipAddress;
-        _port = p_port;
+        try
+        {
+            _tcpClient = new TcpClient(p_ipAddress, p_port);
+            _networkStream = _tcpClient.GetStream();
+            _streamWriter = new StreamWriter(_networkStream);
+            _streamReader = new StreamReader(_networkStream);
+            _isConnected = true;
+            if (p_callbackSuccess != null) p_callbackSuccess();
+        }
+        catch (SocketException p_socketException)
+        {
+            UnityEngine.Debug.Log("Socket error:" + p_socketException);
+            if (p_callbackFailed != null)
+                p_callbackFailed();
+        }
+    }
+    // Abre o servidor e depois inicia a conexão
+    public void OpenAndSetupSocket(string p_ipAddress, int p_port, int p_maxClients, float p_turnTime, Action p_callbackSuccess, Action p_callbackFailed)
+    {
         Action __callbackSetupSocket = delegate
         {
             try
             {
-                _tcpClient = new TcpClient(_hostIpAddress, _port);
+                _tcpClient = new TcpClient(p_ipAddress, p_port);
                 _networkStream = _tcpClient.GetStream();
                 _streamWriter = new StreamWriter(_networkStream);
                 _streamReader = new StreamReader(_networkStream);
                 _isConnected = true;
-                if (p_callbackSuccess != null) p_callbackSuccess();
+                if (p_callbackSuccess != null)
+                    p_callbackSuccess();
             }
             catch (SocketException p_socketException)
             {
@@ -57,23 +73,16 @@ public class TCPConnector
                     p_callbackFailed();
             }
         };
-
-        if (p_openSocket == true)
-        {
-            OpenSocket(p_ipAddress, p_port, p_turnTime, __callbackSetupSocket, p_callbackFailed);
-        }
-        else
-        {
-            if (__callbackSetupSocket != null) __callbackSetupSocket();
-        }
+        
+        OpenSocket(p_ipAddress, p_port, p_maxClients, p_turnTime, __callbackSetupSocket, p_callbackFailed);
     }
 
-    private void OpenSocket(string p_ipAddress, int p_port, float p_turnTime, Action p_callbackFinish, Action p_callbackFailed = null)
+    private void OpenSocket(string p_ipAddress, int p_port, int p_maxClients, float p_turnTime, Action p_callbackFinish, Action p_callbackFailed = null)
     {
-        CreateSocketInitializeParameters(p_ipAddress, p_port, p_turnTime, delegate
+        CreateSocketInitializeParameters(p_ipAddress, p_port, p_maxClients, p_turnTime, delegate
         {
             Process __process = new Process();
-            __process.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            __process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             __process.StartInfo.CreateNoWindow = false;
             __process.StartInfo.UseShellExecute = false;
 
@@ -96,12 +105,13 @@ public class TCPConnector
         });
     }
 
-    private void CreateSocketInitializeParameters(string p_ipAddress, int p_port, float p_turnTime, Action p_callbackFinish)
+    private void CreateSocketInitializeParameters(string p_ipAddress, int p_port, int p_maxClients, float p_turnTime, Action p_callbackFinish)
     {
         SocketInitializeParameters __socketInitializeParameters = new SocketInitializeParameters();
         __socketInitializeParameters.ipAddress = p_ipAddress;
         __socketInitializeParameters.port = p_port;
         __socketInitializeParameters.turnTime = p_turnTime;
+        __socketInitializeParameters.maxClients = p_maxClients;
         
         string __fullPath = Application.dataPath + "/" +  _socketParametersFilePath;
         File.WriteAllText(__fullPath, JsonUtility.ToJson(__socketInitializeParameters));

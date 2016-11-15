@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 namespace ConsoleApplication1
 {
     public class Program
     {
         public static void Main(string[] args)
-        {
+        { 
             FileReader __fileReader = new FileReader();
             Server __server = new Server();
 

@@ -1,1 +1,1 @@
-{"ipAddress":"127.0.0.1","port":1300,"turnTime":120.0}
+{"ipAddress":"127.0.0.1","port":1300,"maxClients":2,"turnTime":120.0}

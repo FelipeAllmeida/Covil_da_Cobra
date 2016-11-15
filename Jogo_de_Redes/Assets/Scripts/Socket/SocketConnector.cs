@@ -12,10 +12,6 @@ public class SocketConnector
     #region Private Data
     private TCPConnector _tcpConnection;
 
-    private string _ipAddress = "127.0.0.1";
-
-    private int _port = 1300;
-
     private bool _isConnected = false;
 
     private Thread _readStreamThread;
@@ -29,7 +25,6 @@ public class SocketConnector
     public void ApplicationQuitHandler()
     {
         _isConnected = false;
-        //_readStreamThread.Abort();
     }
 
     private bool VerifyIfIsConnectedToSocket()
@@ -37,7 +32,7 @@ public class SocketConnector
         return _tcpConnection.GetIsConnected();
     }
 
-    public void TryConnectToServer(string p_ipAddress, int p_port, float p_turnTime, bool p_openSocket, Action p_callbackSuccess, Action p_callbackFailed)
+    public void TryToConnectToSocket(string p_ipAddress, int p_port, Action p_callbackSuccess, Action p_callbackFailed)
     {
         if (VerifyIfIsConnectedToSocket() == true)
             return;
@@ -47,7 +42,20 @@ public class SocketConnector
             if (p_callbackSuccess != null)
                 p_callbackSuccess();
         };
-        _tcpConnection.SetupSocket(_ipAddress, _port, p_turnTime, p_openSocket, __callbackFinishSetupSocket, p_callbackFailed);
+        _tcpConnection.SetupSocket(p_ipAddress, p_port, __callbackFinishSetupSocket, p_callbackFailed);
+    }
+
+    public void OpenAndTryToConnectToSocket(string p_ipAddress, int p_port, int p_maxClients, float p_turnTime, bool p_openSocket, Action p_callbackSuccess, Action p_callbackFailed)
+    {
+        if (VerifyIfIsConnectedToSocket() == true)
+            return;
+        Action __callbackFinishSetupSocket = delegate
+        {
+            _isConnected = true;
+            if (p_callbackSuccess != null)
+                p_callbackSuccess();
+        };
+        _tcpConnection.OpenAndSetupSocket(p_ipAddress, p_port, p_maxClients, p_turnTime, __callbackFinishSetupSocket, p_callbackFailed);
     }
 
     public void SendData(string p_string)

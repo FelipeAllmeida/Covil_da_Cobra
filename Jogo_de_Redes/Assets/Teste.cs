@@ -12,7 +12,7 @@ public class Teste : MonoBehaviour
             Debug.Log("Socket Iniciado");
         };
         __socket.AInitialize();
-        __socket.TryConnectToServer("127.0.0.1", 1300, 120f, true, __callbackFinished, null);
+        __socket.OpenAndTryToConnectToSocket("127.0.0.1", 1300, 2, 120f, true, __callbackFinished, null);
     }
 	
 }
