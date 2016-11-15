@@ -36,10 +36,10 @@ class Server
     }
 
     #region Initialization
-    public void Initialize()
+    public void Initialize(SocketInitializationData p_socketData)
     {
-        _ipAdress = IPAddress.Parse("127.0.0.1");
-        _tcpListener = new TcpListener(_ipAdress, _serverPort);
+        _ipAdress = IPAddress.Parse(p_socketData.ipAddress);
+        _tcpListener = new TcpListener(_ipAdress, p_socketData.port);
         _listTcpClients = new List<ClientData>();
         _dictStreamToClientThreads = new Dictionary<string, Thread>();
         _bytes = new Byte[1024];

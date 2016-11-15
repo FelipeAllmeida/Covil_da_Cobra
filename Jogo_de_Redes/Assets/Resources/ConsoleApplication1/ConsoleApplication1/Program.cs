@@ -8,8 +8,11 @@ namespace ConsoleApplication1
     {
         public static void Main(string[] args)
         {
+            FileReader __fileReader = new FileReader();
             Server __server = new Server();
-            __server.Initialize();
+
+            SocketInitializationData __socketData = __fileReader.GetSocketInitializationData();
+            __server.Initialize(__socketData);
         }
     }
 }
