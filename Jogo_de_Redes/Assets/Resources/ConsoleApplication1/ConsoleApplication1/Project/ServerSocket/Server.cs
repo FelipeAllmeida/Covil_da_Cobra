@@ -57,6 +57,7 @@ class Server
         _stopwatchClientStream = new Stopwatch();
         _currentState = SocketState.RECEIVING_CLIENT_DATA;
         _maxClients = p_socketData.maxClients;
+        _waitClientResponseTime = p_socketData.turnTime;
         RunServer();
     }
     #endregion
@@ -72,9 +73,6 @@ class Server
         catch (SocketException p_socketException)
         {
             Console.WriteLine("SocketException: {0}", p_socketException);
-        }
-        finally
-        {                
         }
     }
 
@@ -98,7 +96,7 @@ class Server
         if (_stopwatchClientStream.IsRunning == false)
         {
             Console.WriteLine("Waiting client data for {0} seconds", _waitClientResponseTime);
-            StartWaitClientsStreamThread(_waitClientResponseTime, null);
+            StartWaitClientsStreamThread(_waitClientResponseTime);
             _stopwatchClientStream.Start();
         }
         else
@@ -133,6 +131,7 @@ class Server
 
     private void StartAcceptTcpClientThread(Action p_callbackFinish)
     {
+        Console.WriteLine("Waiting for clients to connect...\n");
         _threadClientAcception = new Thread(new ParameterizedThreadStart(AcceptTcpClientThread));
         Action __callbackThreadFinish = delegate
         {
@@ -163,12 +162,11 @@ class Server
         }
     }
 
-    private void StartWaitClientsStreamThread(float p_waitTime, Action p_callbackFinish)
+    private void StartWaitClientsStreamThread(float p_waitTime)
     {
-        _listClients = new List<ClientData>();
-
-        for (int i = 0;i < _listClients.Count;i++)
+        for (int i = 0; i < _listClients.Count; i++)
         {
+            Console.WriteLine(i);
             Thread __newThread = new Thread(new ParameterizedThreadStart(WaitClientStreamThread));
             __newThread.Start(_listClients[i]);
             _listClientWaitForResponseThreads.Add(__newThread);
@@ -208,7 +206,6 @@ class Server
         string __type = JSON.Parse(p_response);
         StreamToClients(p_response);    
     }
-
 
 }
 public static class AUtility
