@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="Project\ServerSocket\SocketController.cs" />
     <Compile Include="Project\ServerSocket\SocketData.cs" />
     <Compile Include="Project\Utility\FileReader.cs" />
     <Compile Include="Project\Utility\SimpleJSON.cs" />
