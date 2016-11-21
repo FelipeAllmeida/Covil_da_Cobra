@@ -1,4 +1,4 @@
-﻿//#define DEBUGGING
+﻿#define DEBUGGING
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -16,13 +16,21 @@ class FileReader
 
     public SocketInitializationData GetSocketInitializationData()
     {
+
         SocketInitializationData __socketData = new SocketInitializationData();
-        string __jsonString = File.ReadAllText(__socketParametersPath);
-        var __output = SimpleJSON.JSON.Parse(__jsonString);
-        __socketData.ipAddress = __output["ipAddress"];
-        __socketData.port = __output["port"].AsInt;
-        __socketData.turnTime = __output["turnTime"].AsFloat;
-        __socketData.maxClients = __output["maxClients"].AsInt;
+
+        JSONClass rootNode = new JSONClass();
+
+        rootNode.Add("ipAddress", new JSONData("127.0.0.1"));
+        rootNode.Add("port", new JSONData("1300"));
+        rootNode.Add("maxClients", new JSONData("1"));
+        rootNode.Add("turnTime", new JSONData("120"));
+
+
+        __socketData.ipAddress = rootNode["ipAddress"];
+        __socketData.port = rootNode["port"].AsInt;
+        __socketData.turnTime = rootNode["turnTime"].AsFloat;
+        __socketData.maxClients = rootNode["maxClients"].AsInt;
         return __socketData;
     }
 }

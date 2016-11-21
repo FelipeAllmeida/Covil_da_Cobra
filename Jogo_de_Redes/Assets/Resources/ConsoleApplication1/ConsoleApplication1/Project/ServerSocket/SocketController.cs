@@ -12,14 +12,14 @@ class SocketController
 {
     #region Public Data
     public List<ClientData> _listClients;                   // Lista pública com os dados dos clientes
-                                                            // É usada para armazenar a última resposta do
-                                                            // cliente para com o socket e também a próxima
-                                                            // resposta do socket para o cliente.
+    // É usada para armazenar a última resposta do
+    // cliente para com o socket e também a próxima
+    // resposta do socket para o cliente.
     #endregion
 
     #region Private Data
     private TcpListener _tcpListener;                       // Escuta as conexões tcps dos clientes
-                    
+
     private Thread _threadClientAcception;                  // Rêferencia a thread da aceitação de clientes
 
     private List<Thread> _listClientWaitForResponseThreads; // Lista com a referência as thread de espera de resposta dos clients
@@ -28,7 +28,7 @@ class SocketController
 
     private int _maxClients = 0;                            // Número máximo de clientes
     private int _clientResponseCounter;                     // Contador de quantos clientes já responderam
-    
+
     private bool _isServerRunning = false;                  // Se o socket está executando
     private bool _isAcceptingNewClients = true;             // Se o socket está aceitando conexões
 
@@ -45,7 +45,7 @@ class SocketController
 
     #region Initialization
     //Inicializa o socket recebendo os parametros "SocketInitializationData", deve ser chamado antes de qualquer outro método
-    public void Initialize(SocketInitializationData p_socketData)           
+    public void Initialize(SocketInitializationData p_socketData)
     {
         _ipAdress = IPAddress.Parse(p_socketData.ipAddress);
         _tcpListener = new TcpListener(_ipAdress, p_socketData.port);
@@ -53,6 +53,7 @@ class SocketController
         _listClientWaitForResponseThreads = new List<Thread>();
         _bytes = new Byte[1024];
         _maxClients = p_socketData.maxClients;
+
     }
     #endregion
 
@@ -91,11 +92,12 @@ class SocketController
     public void StartAcceptTcpClientThread(Action p_callbackFinish)
     {
         if (_isAcceptingNewClients == false)
-            return; 
+            return;
         Console.WriteLine("Waiting all {0} clients to connect...", _maxClients);
         _threadClientAcception = new Thread(new ParameterizedThreadStart(AcceptTcpClientThread));
         _threadClientAcception.Start(p_callbackFinish);
     }
+
 
     // Lógia da aceitação do cliente
     private void AcceptTcpClientThread(object p_callbackFinish)
@@ -107,6 +109,13 @@ class SocketController
                 Console.WriteLine("All clients connected, starting game...");
                 _isAcceptingNewClients = false;
                 if ((Action)p_callbackFinish != null) ((Action)p_callbackFinish)();
+
+                //for (int i = 0; i < _listClients.Count; i++)
+                //{
+                //_listClients[0].clientToSendResponse = "START";
+                //    }
+                //_listClients[0].clientToSendResponse = "s";
+                StreamToClients();
             }
             else
             {
@@ -133,7 +142,7 @@ class SocketController
             Thread __newThread = new Thread(__callbackThreadStart);
             __newThread.Start();
             _listClientWaitForResponseThreads.Add(__newThread);
-        }        
+        }
     }
 
     // Lógica da espera da resposta do cliente
@@ -144,11 +153,17 @@ class SocketController
         if (__readCount != 0)
         {
             string __response = Encoding.ASCII.GetString(_bytes, 0, __readCount);
+
             Console.WriteLine("Received data from Client [{0}]: \n{1}", p_clientData.id, __response);
+
             p_clientData.clientToGetResponse = __response;
+
             _listClients[_listClients.FindIndex(x => x.id == p_clientData.id)] = p_clientData;
+
             __networkStream.Flush();
+
             _clientResponseCounter++;
+
             if (_clientResponseCounter >= _maxClients)
             {
                 if (p_callbackFinish != null) p_callbackFinish();
@@ -160,7 +175,7 @@ class SocketController
     // na váriavel clientToSendResponse da struct ClientData
     public void StreamToClients()
     {
-        for (int i = 0;i < _listClients.Count;i++)
+        for (int i = 0; i < _listClients.Count; i++)
         {
             Console.WriteLine("Sending data to Client [{0}]: \n{1}", _listClients[i].id, _listClients[i].clientToSendResponse);
             string __response = _listClients[i].clientToSendResponse;

@@ -73,7 +73,7 @@ public class TCPConnector
                     p_callbackFailed();
             }
         };
-        
+
         OpenSocket(p_ipAddress, p_port, p_maxClients, p_turnTime, __callbackSetupSocket, p_callbackFailed);
     }
 
@@ -112,13 +112,13 @@ public class TCPConnector
         __socketInitializeParameters.port = p_port;
         __socketInitializeParameters.turnTime = p_turnTime;
         __socketInitializeParameters.maxClients = p_maxClients;
-        
-        string __fullPath = Application.dataPath + "/" +  _socketParametersFilePath;
+
+        string __fullPath = Application.dataPath + "/" + _socketParametersFilePath;
         File.WriteAllText(__fullPath, JsonUtility.ToJson(__socketInitializeParameters));
         if (p_callbackFinish != null)
             p_callbackFinish();
     }
-    
+
 
     //Envia a mensagem para o socket.
     public void SendData(string p_string)
@@ -126,10 +126,13 @@ public class TCPConnector
         if (!_isConnected)
             return;
 
-        string __tempString = p_string + "\r\n";
+        string __tempString = p_string;// +"\r\n";
         _streamWriter.Write(__tempString);
         _streamWriter.Flush();
+        //_streamWriter.Dispose();
+        //Send(_tcpClient, __tempString);
     }
+
 
     //Lê a mensagem recebida pelo servidor.
     public string ReceiveData()
@@ -141,7 +144,10 @@ public class TCPConnector
             {
                 byte[] __dataToRead = new Byte[_tcpClient.SendBufferSize];
                 _networkStream.Read(__dataToRead, 0, __dataToRead.Length);
+
                 __response = System.Text.Encoding.UTF8.GetString(__dataToRead);
+
+
             }
         }
         catch (SocketException p_socketException)

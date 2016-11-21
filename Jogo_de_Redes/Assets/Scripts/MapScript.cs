@@ -10,13 +10,13 @@ public class MapScript : MonoBehaviour
 
 
     public Transform[] Arvores;
-    public Transform obstaclePrefab;
+   //public Transform obstaclePrefab;
 
 
-    public Transform Grupo1;
+    //public Transform Grupo1;
 
-    public Transform VilasOrcPrefab;
-    public Transform VilasHumanosPrefab;
+    //public Transform VilasOrcPrefab;
+    //public Transform VilasHumanosPrefab;
 
     public Vector2 mapSize;
 
@@ -64,72 +64,47 @@ public class MapScript : MonoBehaviour
                 newTile.localScale = Vector3.one * (1 - outlinePercent);
                 newTile.parent = mapHolder;
 
-                //  newTile.name = "Campo" + x + y;
-                newTile.name = "S" + x + y;
-                //  newTile. = "Tile";
+                string str_tileX = null;
+                string str_tileY = null;
+                if (x < 10)
+                {
+                    str_tileX = "0" + x;
+                }
+                else
+                {
+                    str_tileX = x.ToString();
+                }
+                if (y < 10)
+                {
+                    str_tileY = "0" + y;
+                }
+                else
+                {
+                    str_tileY = y.ToString();
+                }
+                newTile.name = "S" + str_tileX + str_tileY;
+
+                newTile.GetComponent<Renderer>().material.color = Color.green;
+
+                GlobalVariables.TilesEmJogo.Add(newTile);
             }
         }
-
-        //-14.5, -14.5;
-        //14.5, -14.5;
-        //-14.5, 14.5;
-        //14.5, 14.5;
-
-        Coord Cord1 = new Coord(-9, 12);
-        Coord Cord2 = new Coord(15, 12);
-        Coord Cord3 = new Coord(-9, 10);
-        Coord Cord4 = new Coord(-9, -11);
-
-        var randCoord = new List<Coord>();
-        randCoord.Add(Cord1);
-        randCoord.Add(Cord2);
-        randCoord.Add(Cord3);
-        randCoord.Add(Cord4);
-
-        ///////////////////////////gerar vila 1
-        System.Random rnd = new System.Random();
-        int r = rnd.Next(randCoord.Count);
-
-        Coord randomCoordVila = new Coord(randCoord[r].x, randCoord[r].y);
-        Vector3 VilaPosition = new Vector3(randomCoordVila.x, 0, randomCoordVila.y);// CoordToPosition(randomCoordVila.x, randomCoordVila.y);
-        Transform newVila = Instantiate(VilasOrcPrefab, VilaPosition, Quaternion.identity) as Transform;
-        newVila.parent = mapHolder;
-
-        //grupo 1 posicao
-        var playerPosition = new Vector3(VilaPosition.x+10, 0, VilaPosition.y+10);
-        Transform newGroup = Instantiate(Grupo1, playerPosition + Vector3.up * 2f, Quaternion.identity) as Transform;
-        newGroup.parent = mapHolder;
-        
-
-
-        randCoord.Remove(randCoord[r]);
-
-        /////////////////////////////gerar vila 2
-        System.Random rnd2 = new System.Random();
-        int r2 = rnd2.Next(randCoord.Count);
-
-        Coord randomCoordVila2 = new Coord(randCoord[r2].x, randCoord[r2].y);
-        Vector3 VilaPosition2 = new Vector3(randomCoordVila2.x, 0, randomCoordVila2.y);// CoordToPosition(randomCoordVila2.x, randomCoordVila2.y);
-        Transform newVila2 = Instantiate(VilasHumanosPrefab, VilaPosition2, Quaternion.identity) as Transform;
-        newVila2.parent = mapHolder;
-
-
 
 
 
 
         //ARVORES 
-        int obstacleCount = 20;
+        System.Random rndarvore = new System.Random();
+        int obstacleCount = 30;
         for (int i = 0; i < obstacleCount; i++)
         {
-            System.Random rndarvore = new System.Random();
-            int rarvore = rndarvore.Next(3);
-           
+
+            int rarvore = rndarvore.Next(0, 2);
+            var arvore = Arvores[rarvore];
 
             Coord randomCoord = GetRandomCoord();
             Vector3 obstaclePosition = CoordToPosition(randomCoord.x, randomCoord.y);
-            Transform newObstacle = Instantiate(Arvores[rarvore], obstaclePosition + Vector3.up * 2f, Quaternion.identity) as Transform;
-            newObstacle.parent = mapHolder;
+            Transform newObstacle = Instantiate(arvore, obstaclePosition + Vector3.up * 2 , Quaternion.identity) as Transform;
         }
 
     }

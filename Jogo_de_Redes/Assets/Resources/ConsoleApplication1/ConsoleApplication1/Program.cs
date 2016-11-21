@@ -11,6 +11,9 @@ namespace ConsoleApplication1
             Server __server = new Server();
 
             SocketInitializationData __socketData = __fileReader.GetSocketInitializationData();
+
+
+
             __server.Initialize(__socketData);
         }
     }

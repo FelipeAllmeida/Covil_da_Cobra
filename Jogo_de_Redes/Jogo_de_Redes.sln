@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
+# Visual Studio 2013
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jogo_de_Redes.CSharp", "Jogo_de_Redes.CSharp.csproj", "{E41F13F7-22F1-DE63-502C-75A2A406C9A1}"
 EndProject
 Global

@@ -8,7 +8,7 @@ using System.Threading;
 using SimpleJSON;
 
 
-class Server
+class Server : GameController
 {
     private enum SocketState
     {
@@ -23,6 +23,7 @@ class Server
     private Thread _threadClientAcception;
 
     private List<ClientData> _listClients;
+
     private List<Thread> _listClientWaitForResponseThreads;
 
     private IPAddress _ipAdress;
@@ -87,7 +88,7 @@ class Server
                     break;
                 case SocketState.SENDING_CLIENT_DATA:
                     break;
-            }        
+            }
         }
     }
 
@@ -106,7 +107,7 @@ class Server
             {
                 _stopwatchClientStream.Stop();
                 _stopwatchClientStream.Reset();
-                for (int i = 0;i < _listClientWaitForResponseThreads.Count;i++)
+                for (int i = 0; i < _listClientWaitForResponseThreads.Count; i++)
                 {
                     if (_listClientWaitForResponseThreads[i].IsAlive == true)
                     {
@@ -142,6 +143,13 @@ class Server
         _threadClientAcception.Start(__callbackThreadFinish);
     }
 
+    private string GameBegin()
+    {
+        JSONClass Node = new JSONClass();
+        Node.Add("Request", new JSONData("GAME_BEGIN"));
+        return Node["Request"];
+    }
+
     private void AcceptTcpClientThread(object p_callbackFinish)
     {
         while (_isAcceptingNewClients == true)
@@ -149,7 +157,11 @@ class Server
             if (_listClients.Count >= _maxClients)
             {
                 Console.WriteLine("All clients connected, starting game...");
+
+                StreamToClients("1");
+
                 if ((Action)p_callbackFinish != null) ((Action)p_callbackFinish)();
+
             }
             else
             {
@@ -158,6 +170,7 @@ class Server
                 __clientData.id = Guid.NewGuid().ToString();
                 _listClients.Add(__clientData);
                 Console.WriteLine("New Client Connected, total of: {0}\n", _listClients.Count);
+                //((Action)p_callbackFinish)();
             }
         }
     }
@@ -181,16 +194,63 @@ class Server
         if (__readCount != 0)
         {
             string __response = Encoding.ASCII.GetString(_bytes, 0, __readCount);
+
+
             Console.WriteLine("Dados recebidos do cliente[{0}]: \n{1}", __clientData.id, __response);
             __clientData.clientResponse = __response;
             _listClients[_listClients.FindIndex(x => x.id == __clientData.id)] = __clientData;
             __networkStream.Flush();
-        } 
+
+
+            bool isEnum = __response.Substring(0, 1) == "E";
+
+            ClientData cliente = _listClients[_listClients.FindIndex(x => x.id == __clientData.id)];
+
+            //envia o nome do jogador
+            //Se for ENUM
+            if (isEnum)
+            {
+                GameState __responseENUM = (GameState)Enum.Parse(typeof(GameState), __response);
+                switch (__responseENUM)
+                {
+
+                    case GameState.REQUEST_PLAYER_NUMBER:
+                        StreamToClients(get_nPlayer().ToString());
+                        break;
+                    case GameState.CAN_START:
+                        if (CanStart())
+                        {
+                            StreamToClients(GameBegin());
+                        }
+                        break;
+                }
+            }
+            //Se for Dados
+            else
+            {
+                __response = __response.Substring(1, __response.Length - 1);
+                if ((_listClients.Count - 1) < _maxClients)
+                {
+                    Players(__response, cliente.id);
+                }
+                else
+                {
+                    PlayerOK(char.Parse(__response), cliente.id);
+                    if (CanStart())
+                    {
+                        StreamToClients("START");
+                    }
+                }
+
+
+            }
+            //__networkStream.Close();
+        }
     }
 
     private void StreamToClients(string p_responseToStream)
-    {                 
-        for (int i = 0;i < _listClients.Count;i++)
+    {
+        for (int i = 0; i < _listClients.Count; i++)
         {
             string __response = p_responseToStream;
             byte[] __dataToSend = Encoding.ASCII.GetBytes(__response);
@@ -198,13 +258,15 @@ class Server
             NetworkStream __networkStream = _listClients[i].tcpClient.GetStream();
             __networkStream.Write(__dataToSend, 0, __dataToSend.Length);
             __networkStream.Flush();
+            Console.WriteLine("Dados enviados cliente[{0}]: \n{1}", _listClients[i].id, __response);
+            _currentState = SocketState.RECEIVING_CLIENT_DATA;
         }
     }
 
     private void MessageHandler(string p_response)
     {
         string __type = JSON.Parse(p_response);
-        StreamToClients(p_response);    
+        StreamToClients(p_response);
     }
 
 }

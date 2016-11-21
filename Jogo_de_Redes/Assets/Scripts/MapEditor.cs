@@ -1,19 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEditor;
+//using UnityEditor;
 
 
-[CustomEditor(typeof(MapScript))]
-public class MapEditor : Editor
-{
+//[CustomEditor(typeof(MapScript))]
+//public class MapEditor : Editor
+//{
 
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
+//    public override void OnInspectorGUI()
+//    {
+//        base.OnInspectorGUI();
 
-        MapScript map = target as MapScript;
+//        MapScript map = target as MapScript;
 
-        // map.GenerateMap();
-    }
+//         map.GenerateMap();
+//    }
 
-}
+//}

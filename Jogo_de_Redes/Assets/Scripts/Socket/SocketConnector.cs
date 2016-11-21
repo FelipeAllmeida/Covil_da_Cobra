@@ -11,6 +11,7 @@ public class SocketConnector
 
     #region Private Data
     private TCPConnector _tcpConnection;
+    private GameController _GameController;
 
     private bool _isConnected = false;
 
@@ -20,6 +21,7 @@ public class SocketConnector
     public void AInitialize()
     {
         _tcpConnection = new TCPConnector();
+        _GameController = new GameController();
     }
 
     public void ApplicationQuitHandler()
@@ -36,12 +38,14 @@ public class SocketConnector
     {
         if (VerifyIfIsConnectedToSocket() == true)
             return;
+
         Action __callbackFinishSetupSocket = delegate
         {
             _isConnected = true;
             if (p_callbackSuccess != null)
                 p_callbackSuccess();
         };
+
         _tcpConnection.SetupSocket(p_ipAddress, p_port, __callbackFinishSetupSocket, p_callbackFailed);
     }
 
@@ -65,6 +69,7 @@ public class SocketConnector
             Debug.Log("Not connected");
             return;
         }
+
         _tcpConnection.SendData(p_string);
     }
 
@@ -81,7 +86,18 @@ public class SocketConnector
             string __response = _tcpConnection.ReceiveData();
             if (__response != string.Empty)
             {
-                Debug.Log("Socket response: " + __response);
+                //  Debug.Log("Socket response: " + __response);
+                GlobalVariables.IS_SERVER_READY = true;
+
+                int start = 0;
+                var begin = int.TryParse(__response, out start);
+                if (begin && start == 1)
+                {
+                    GlobalVariables.WAITING = true;
+                }
+
+                GlobalVariables._SERVER_RESPONSE = __response;
+
                 if (onSocketResponse != null)
                     onSocketResponse(__response);
             }
