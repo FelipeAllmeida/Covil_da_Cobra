@@ -11,7 +11,7 @@ using SimpleJSON;
 class SocketController
 {
     #region Public Data
-    public List<ClientData> _listClients;                   // Lista pública com os dados dos clientes
+    public List<ClientData> listClients;                   // Lista pública com os dados dos clientes
     // É usada para armazenar a última resposta do
     // cliente para com o socket e também a próxima
     // resposta do socket para o cliente.
@@ -49,11 +49,10 @@ class SocketController
     {
         _ipAdress = IPAddress.Parse(p_socketData.ipAddress);
         _tcpListener = new TcpListener(_ipAdress, p_socketData.port);
-        _listClients = new List<ClientData>();
+        listClients = new List<ClientData>();
         _listClientWaitForResponseThreads = new List<Thread>();
         _bytes = new Byte[1024];
         _maxClients = p_socketData.maxClients;
-
     }
     #endregion
 
@@ -83,7 +82,7 @@ class SocketController
     {
         Console.WriteLine("Socket Stopped");
         _isServerRunning = false;
-        _listClients.Clear();
+        listClients.Clear();
         _tcpListener.Stop();
     }
 
@@ -104,26 +103,19 @@ class SocketController
     {
         while (_isAcceptingNewClients == true)
         {
-            if (_listClients.Count >= _maxClients)
+            if (listClients.Count >= _maxClients)
             {
                 Console.WriteLine("All clients connected, starting game...");
                 _isAcceptingNewClients = false;
                 if ((Action)p_callbackFinish != null) ((Action)p_callbackFinish)();
-
-                //for (int i = 0; i < _listClients.Count; i++)
-                //{
-                //_listClients[0].clientToSendResponse = "START";
-                //    }
-                //_listClients[0].clientToSendResponse = "s";
-                StreamToClients();
             }
             else
             {
                 ClientData __clientData = new ClientData();
                 __clientData.tcpClient = _tcpListener.AcceptTcpClient();
                 __clientData.id = Guid.NewGuid().ToString();
-                _listClients.Add(__clientData);
-                Console.WriteLine("New Client connected, {0} of {1}\n", _listClients.Count, _maxClients);
+                listClients.Add(__clientData);
+                Console.WriteLine("New Client connected, {0} of {1}\n", listClients.Count, _maxClients);
             }
         }
     }
@@ -133,11 +125,12 @@ class SocketController
     public void StartWaitClientsStreamThread(Action p_callbackFinish)
     {
         _clientResponseCounter = 0;
-        for (int i = 0; i < _listClients.Count; i++)
+        for (int i = 0; i < listClients.Count; i++)
         {
+            int __index = i;
             ThreadStart __callbackThreadStart = delegate
             {
-                WaitClientStreamThread(_listClients[i], p_callbackFinish);
+                WaitClientStreamThread(listClients[__index], p_callbackFinish);
             };
             Thread __newThread = new Thread(__callbackThreadStart);
             __newThread.Start();
@@ -158,7 +151,7 @@ class SocketController
 
             p_clientData.clientToGetResponse = __response;
 
-            _listClients[_listClients.FindIndex(x => x.id == p_clientData.id)] = p_clientData;
+            listClients[listClients.FindIndex(x => x.id == p_clientData.id)] = p_clientData;
 
             __networkStream.Flush();
 
@@ -175,13 +168,13 @@ class SocketController
     // na váriavel clientToSendResponse da struct ClientData
     public void StreamToClients()
     {
-        for (int i = 0; i < _listClients.Count; i++)
+        for (int i = 0; i < listClients.Count; i++)
         {
-            Console.WriteLine("Sending data to Client [{0}]: \n{1}", _listClients[i].id, _listClients[i].clientToSendResponse);
-            string __response = _listClients[i].clientToSendResponse;
+            Console.WriteLine("Sending data to Client [{0}]: \n{1}", listClients[i].id, listClients[i].clientToSendResponse);
+            string __response = listClients[i].clientToSendResponse;
             byte[] __dataToSend = Encoding.ASCII.GetBytes(__response);
 
-            NetworkStream __networkStream = _listClients[i].tcpClient.GetStream();
+            NetworkStream __networkStream = listClients[i].tcpClient.GetStream();
             __networkStream.Write(__dataToSend, 0, __dataToSend.Length);
             __networkStream.Flush();
         }
