@@ -14,6 +14,7 @@ public class SocketConnector
     private GameController _GameController;
 
     private bool _isConnected = false;
+    private bool _isReading = false;
 
     private Thread _readStreamThread;
     #endregion
@@ -75,13 +76,14 @@ public class SocketConnector
 
     public void StartReadSocketDataThread()
     {
+        _isReading = true;
         _readStreamThread = new Thread(ReadSocketDataThread);
         _readStreamThread.Start();
     }
 
     private void ReadSocketDataThread()
     {
-        while (_isConnected == true)
+        while (_isReading == true)
         {
             string __response = _tcpConnection.ReceiveData();
             if (__response != string.Empty)
@@ -102,6 +104,11 @@ public class SocketConnector
                     onSocketResponse(__response);
             }
         }
+    }
+
+    public void StopReadingSocketDataThread()
+    {
+        _isReading = false;
     }
 
     public void ReadSocketData()

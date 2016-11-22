@@ -26,7 +26,6 @@ namespace ConsoleApplication1
                         {
                             SocketController.ClientData __clientData = __server.listClients[i];
                             __clientData.clientToSendResponse = "VC É UM VIADAO";
-
                             __server.listClients[__server.listClients.FindIndex(x => x.id == __clientData.id)] = __clientData;
                         }
                         __server.StreamToClients();
