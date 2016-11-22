@@ -8,7 +8,7 @@ using System.Threading;
 using SimpleJSON;
 
 
-class SocketController
+class SocketController : GameController
 {
     #region Public Data
     public List<ClientData> listClients;                   // Lista pública com os dados dos clientes
@@ -107,13 +107,29 @@ class SocketController
             {
                 Console.WriteLine("All clients connected, starting game...");
                 _isAcceptingNewClients = false;
+
                 if ((Action)p_callbackFinish != null) ((Action)p_callbackFinish)();
+
+                //* ---> Novo
+                //lobby de espera
+                for (int i = 0; i < listClients.Count; i++)
+                {
+                    SocketController.ClientData __clientData = listClients[i];
+                    __clientData.clientToSendResponse = "1";
+                    listClients[listClients.FindIndex(x => x.id == __clientData.id)] = __clientData;
+                }
+                StreamToClients((Action)p_callbackFinish);
             }
             else
             {
                 ClientData __clientData = new ClientData();
                 __clientData.tcpClient = _tcpListener.AcceptTcpClient();
                 __clientData.id = Guid.NewGuid().ToString();
+
+                //* ---> Novo
+                //set idPlayer 1/2
+                setIdOrder(__clientData.id);
+
                 listClients.Add(__clientData);
                 Console.WriteLine("New Client connected, {0} of {1}\n", listClients.Count, _maxClients);
             }
@@ -157,6 +173,50 @@ class SocketController
 
             _clientResponseCounter++;
 
+            //* ---> Novo
+
+            /////JSON
+            var p_JsonResponse = JSON.Parse(__response);
+            bool PlayerReady = p_JsonResponse["PlayerReady"].AsBool;
+            string PlayerName = p_JsonResponse["PlayerName"].Value;
+            string TeamChoisen = p_JsonResponse["TeamChoisen"].Value;
+
+            string p_playerID = listClients[listClients.FindIndex(x => x.id == p_clientData.id)].id;
+
+            //Se os jogadores estao conectando - procura pelo o id e seta o nome
+            if (CURRENT_STATE == GameState.CONNECTING_PLAYERS)
+            {
+                if (_PlayersConnected < 2)
+                {
+                    JoinnedPlayers(PlayerName, p_playerID);
+                }
+            }
+
+                //se os jogadores estao no lobby para escolher time
+            else if (CURRENT_STATE == GameState.CHOOSING_TEAM)
+            {
+                if (_PlayersReady < 2)
+                {
+                    PlayerTeam(TeamChoisen, p_playerID);
+                }
+            }
+
+                      //se os jogadores estao prontos para iniciar
+            else if (CURRENT_STATE == GameState.START_GAME)
+            {
+                for (int i = 0; i < listClients.Count; i++)
+                {
+                    SocketController.ClientData __clientData = listClients[i];
+                    //pronto pra comecar
+                    __clientData.clientToSendResponse = "2";
+                    listClients[listClients.FindIndex(x => x.id == __clientData.id)] = __clientData;
+                }
+                StreamToClients(p_callbackFinish);
+            }
+
+            //* ---> Novo
+
+
             if (_clientResponseCounter >= _maxClients)
             {
                 if (p_callbackFinish != null) p_callbackFinish();
@@ -166,7 +226,7 @@ class SocketController
 
     // Envia dados do socket para o cliente. O dado enviado precisa ser setado
     // na váriavel clientToSendResponse da struct ClientData
-    public void StreamToClients()
+    public void StreamToClients(Action p_callbackFinish)
     {
         for (int i = 0; i < listClients.Count; i++)
         {
@@ -177,6 +237,7 @@ class SocketController
             NetworkStream __networkStream = listClients[i].tcpClient.GetStream();
             __networkStream.Write(__dataToSend, 0, __dataToSend.Length);
             __networkStream.Flush();
+            StartWaitClientsStreamThread((Action)p_callbackFinish);
         }
     }
 }

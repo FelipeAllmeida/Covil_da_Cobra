@@ -4,20 +4,19 @@ using System.Collections.Generic;
 
 public class TileScript : MonoBehaviour
 {
-    private GameObject[] player;
+    private GameObject[] _player;
 
-    private bool ServResponse = false;
+    private bool _ServResponse = false;
 
-    private bool CanWalk = true;
-    private bool CanAtk = true;
-    private bool CanDef = true;
-
+    private bool _CanWalk = true;
+    private bool _CanAtk = true;
+    private bool _CanDef = true;
 
     void Start()
     {
-        player = GameObject.FindGameObjectsWithTag("Player");
+        _player = GameObject.FindGameObjectsWithTag("Player");
 
-        GlobalVariables.ListaPersonagens = player;
+        GlobalVariables.ListaPersonagens = _player;
     }
 
     void Update()
@@ -39,7 +38,7 @@ public class TileScript : MonoBehaviour
             //    }
             //}
 
-            if (!ServResponse)
+            if (!_ServResponse)
             {
 
                 if (this.GetComponent<Renderer>().material.color != Color.green)
@@ -50,18 +49,19 @@ public class TileScript : MonoBehaviour
                     {
                         if (per.name == GlobalVariables.personagemSelecionado)
                         {
-                            CanWalk = true;
-                            CanAtk = true;
-                            CanDef = true;
+                            _CanWalk = true;
+                            _CanAtk = true;
+                            _CanDef = true;
 
-                            var scr = per.GetComponent<Player>();
+                            Player scr = per.GetComponent<Player>();
+
                             if (scr.ActionPoints != 0 && !GlobalVariables.PlayerAtk && !GlobalVariables.PlayerDef)
                             {
                                 scr.ActionPoints--;
                             }
                             else
                             {
-                                CanWalk = false;
+                                _CanWalk = false;
                             }
 
                             if (scr.ActionPoints >= 3 && GlobalVariables.PlayerAtk)
@@ -71,7 +71,7 @@ public class TileScript : MonoBehaviour
                             }
                             else
                             {
-                                CanAtk = false;
+                                _CanAtk = false;
                             }
 
                             if (scr.ActionPoints >= 3 && GlobalVariables.PlayerDef)
@@ -81,13 +81,13 @@ public class TileScript : MonoBehaviour
                             }
                             else
                             {
-                                CanDef = false;
+                                _CanDef = false;
                             }
 
                         }
                     }
 
-                    if (CanDef && GlobalVariables.PlayerDef)
+                    if (_CanDef && GlobalVariables.PlayerDef)
                     {
 
 
@@ -107,7 +107,7 @@ public class TileScript : MonoBehaviour
                     }
 
 
-                    if (CanAtk && GlobalVariables.PlayerAtk)
+                    if (_CanAtk && GlobalVariables.PlayerAtk)
                     {
 
                         GlobalVariables.GlobalTileColisor[GlobalVariables.personagemSelecionado] = this.name;
@@ -126,7 +126,7 @@ public class TileScript : MonoBehaviour
                     }
 
 
-                    if (CanWalk && !GlobalVariables.PlayerAtk && !GlobalVariables.PlayerDef)
+                    if (_CanWalk && !GlobalVariables.PlayerAtk && !GlobalVariables.PlayerDef)
                     {
 
                         GlobalVariables.GlobalTileColisor[GlobalVariables.personagemSelecionado] = this.name;

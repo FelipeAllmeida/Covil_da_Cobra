@@ -11,8 +11,6 @@ public class InitController : MonoBehaviour
     {
         GlobalVariables.Cameras = cameras;
 
-        
-
         //desabilita todas cameras menos a padrao
         for (int i = 1; i < GlobalVariables.Cameras.Length; i++)
         {
@@ -23,17 +21,19 @@ public class InitController : MonoBehaviour
         if (GlobalVariables.Cameras.Length > 0)
         {
             //time azul
-            if (GlobalVariables.P1_Escolha == 'A')
+            if (GlobalVariables.Player_Team_Chosen == 'A')
             {
                 GlobalVariables.currentCameraIndex = 0;
                 GlobalVariables.Cameras[0].gameObject.SetActive(true);
-                GameObject.Find("RED_SNAKES_Controller").SetActive(false);
+                GlobalVariables.Cameras[3].gameObject.SetActive(false);
+                // GameObject.Find("RED_SNAKES_Controller").SetActive(false);
             }
             else
             {
                 GlobalVariables.currentCameraIndex = 3;
                 GlobalVariables.Cameras[3].gameObject.SetActive(true);
-                GameObject.Find("BLUE_SNAKES_Controller").SetActive(false);
+                GlobalVariables.Cameras[0].gameObject.SetActive(false);
+                // GameObject.Find("BLUE_SNAKES_Controller").SetActive(false);
             }
         }
 
@@ -45,7 +45,7 @@ public class InitController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F1))
         {
-            if (GlobalVariables.P1_Escolha == 'A')
+            if (GlobalVariables.Player_Team_Chosen == 'A')
             {
                 for (int i = 0; i < GlobalVariables.Cameras.Length; i++)
                 {
@@ -67,7 +67,7 @@ public class InitController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F2))
         {
-            if (GlobalVariables.P1_Escolha == 'A')
+            if (GlobalVariables.Player_Team_Chosen == 'A')
             {
                 for (int i = 0; i < GlobalVariables.Cameras.Length; i++)
                 {
@@ -89,7 +89,7 @@ public class InitController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F3))
         {
-            if (GlobalVariables.P1_Escolha == 'A')
+            if (GlobalVariables.Player_Team_Chosen == 'A')
             {
                 for (int i = 0; i < GlobalVariables.Cameras.Length; i++)
                 {

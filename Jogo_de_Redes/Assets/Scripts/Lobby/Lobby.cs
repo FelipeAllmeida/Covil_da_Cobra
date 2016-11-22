@@ -5,36 +5,24 @@ using System;
 using UnityEngine.UI;
 using System.Text;
 using SimpleJSON;
+using System.Collections.Generic;
 
 public class Lobby : MonoBehaviour
 {
 
-    public Text msgAguardando;
-    public Button Criar;
-    public Button Vermelho;
-    public Button Azul;
+    public Text _text_MsgWating;
 
-    SocketConnector __socket;//= new SocketConnector();
+    public Button _button_RedTeam;
+    public Button _button_BlueTeam;
 
-    public Canvas CanvasLogin;
-    public Canvas CanvasLobby;
+    // SocketConnector __socket;
 
-    public Button ok;
+    public Canvas _canvas_Login;
+    public Canvas _canvas_Lobby;
 
-    public Text lblJogador;
-    public Text lblPlayer;
-    public InputField lblName;
-    // private int _nJogador = 1;
+    public Text _text_DisplayPlayerName;
 
-    void Start()
-    {
-    }
-
-    public void Ready()
-    {
-        GlobalVariables.__socket.StartReadSocketDataThread();
-        GlobalVariables.__socket.SendData(PlayerOk());
-    }
+    public InputField _input_PlayerName;
 
     void Update()
     {
@@ -43,90 +31,91 @@ public class Lobby : MonoBehaviour
             if (GlobalVariables.WAITING)
             {
                 this.enabled = false;
-                CanvasLobby.enabled = true;
+                _canvas_Lobby.enabled = true;
 
                 GlobalVariables.IS_SERVER_READY = false;
             }
 
             if (GlobalVariables.START)
             {
+                GlobalVariables.IS_SERVER_READY = false;
                 SceneManager.LoadScene("DefaultScene");
             }
 
         }
     }
 
-    // int c = 9
-    public void Conectar()
+    public struct ConnectionData
     {
-        if (!string.IsNullOrEmpty(lblName.text))
+        public string ID;
+        public string PlayerName;
+        public string EnumRequst;
+        public bool PlayerReady;
+        public char TeamChosen;
+    }
+    ConnectionData _ConnectionData = new ConnectionData();
+
+
+    public void Connect()
+    {
+        _ConnectionData.PlayerReady = false;
+
+        //se o nome nao esta vazio
+        if (!string.IsNullOrEmpty(_input_PlayerName.text))
         {
-
-            //iniciar conexao
             GlobalVariables.__socket = new SocketConnector();
-
-            Action __callbackOk = delegate
-            {
-                msgAguardando.enabled = true;
-
-                GlobalVariables.__socket.StartReadSocketDataThread();
-                GlobalVariables.__socket.SendData(MyNickname());
-
-
-            };
-            Action __callbackFail = delegate
-            {
-                msgAguardando.enabled = true;
-                msgAguardando.text = "Problemas na conexao";
-            };
 
 
             GlobalVariables.__socket.AInitialize();
-            GlobalVariables.__socket.TryToConnectToSocket("127.0.0.1", 1300, __callbackOk, __callbackFail);
+            GlobalVariables.__socket.TryToConnectToSocket("127.0.0.1", 1300,
+                //ok
+                    delegate
+                    {
+                        //mensagem de espera de outro jogador
+                        _text_MsgWating.enabled = true;
+                        _ConnectionData.PlayerName = _input_PlayerName.text;
+                        _text_DisplayPlayerName.text = _input_PlayerName.text;
+                        GlobalVariables.Player_Name = _input_PlayerName.text;
+                        GlobalVariables.__socket.SendData(JsonUtility.ToJson(_ConnectionData));
 
+                    },
+                //fail
+                    delegate
+                    {
+                        _text_MsgWating.enabled = true;
+                        _text_MsgWating.text = "Problemas na conexao";
+                    });
+
+            GlobalVariables.__socket.onSocketResponse += delegate(string p_response)
+            {
+                Debug.Log("Socket response: " + p_response);
+                GlobalVariables.__socket.StopReadingSocketDataThread();
+            };
+
+            GlobalVariables.__socket.StartReadSocketDataThread();
         }
     }
 
-    private string MyNickname()
+    public void PlayerReady()
     {
-        JSONClass Node = new JSONClass();
-        //Node.Add("SendPlayer", new JSONData(1));
-        GlobalVariables.PlayerName = lblName.text;
-        Node.Add("SendName", new JSONData("D" + lblName.text));
-        lblJogador.text = lblName.text;
-        return Node["SendName"];
+        _ConnectionData.PlayerReady = true;
+        _ConnectionData.TeamChosen = GlobalVariables.Player_Team_Chosen;
+        GlobalVariables.__socket.SendData(JsonUtility.ToJson(_ConnectionData));
+        GlobalVariables.__socket.StartReadSocketDataThread();
     }
 
-
-    private string PlayerOk()
+    public void BlueTeam()
     {
-        JSONClass Node = new JSONClass();
-        Node.Add("SendName", new JSONData("D" + GlobalVariables.P1_Escolha));
-        return Node["SendName"];
+        GlobalVariables.Player_Team_Chosen = 'A';
+        _button_BlueTeam.interactable = false;
+        _button_RedTeam.interactable = true;
     }
 
-    private string RequestStart()
+    public void ReadTeam()
     {
-        JSONClass Node = new JSONClass();
-        Node.Add("Request", new JSONData("CAN_START"));
-        return Node["Request"];
-    }
-
-    public void TimeAzul()
-    {
-        GlobalVariables.P1_Escolha = 'A';
-        Azul.interactable = false;
-        Vermelho.interactable = true;
-        //  SceneManager.LoadScene("DefaultScene");
-    }
-
-    public void TimeVermelho()
-    {
-        GlobalVariables.P1_Escolha = 'V';
-        Vermelho.interactable = false;
-
-        Azul.interactable = true;
-        //  SceneManager.LoadScene("DefaultScene");
+        GlobalVariables.Player_Team_Chosen = 'V';
+        _button_RedTeam.interactable = false;
+        _button_BlueTeam.interactable = true;
     }
 
 }

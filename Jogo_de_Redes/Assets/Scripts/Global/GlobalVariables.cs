@@ -4,8 +4,13 @@ using System.Collections.Generic;
 
 public static class GlobalVariables
 {
+
+
     public static string personagemSelecionado;
     public static GameObject[] ListaPersonagens;
+
+    public static char Player_Team_Chosen;
+    public static string Player_Name;
 
     public static char P1_Escolha = 'A';
     public static char P2_Escolha;
@@ -40,8 +45,8 @@ public static class GlobalVariables
 
     public static SocketConnector __socket;
 
+   // public static SocketConnector __socket;
 
-
-       //public static List<string> TileProibidos = new List<string>();//.Add("S2007");
+    //public static List<string> TileProibidos = new List<string>();//.Add("S2007");
 
 }

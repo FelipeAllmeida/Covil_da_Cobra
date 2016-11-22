@@ -6,7 +6,7 @@ namespace ConsoleApplication1
     public class Program
     {
         public static void Main(string[] args)
-        { 
+        {
             FileReader __fileReader = new FileReader();
             SocketController __server = new SocketController();
 
@@ -22,18 +22,11 @@ namespace ConsoleApplication1
                     __server.StartWaitClientsStreamThread(delegate
                     {
                         Console.WriteLine("Todos os dados recebidos");
-                        for (int i = 0; i < __server.listClients.Count;i++)
-                        {
-                            SocketController.ClientData __clientData = __server.listClients[i];
-                            __clientData.clientToSendResponse = "VC É UM VIADAO";
-                            __server.listClients[__server.listClients.FindIndex(x => x.id == __clientData.id)] = __clientData;
-                        }
-                        __server.StreamToClients();
                     });
                 });
             }, delegate
             {
-                Console.WriteLine("DEU RUIN");
+                Console.WriteLine("DEU RUIM");
             });
             while (true)
             {

@@ -23,7 +23,7 @@ class FileReader
 
         rootNode.Add("ipAddress", new JSONData("127.0.0.1"));
         rootNode.Add("port", new JSONData("1300"));
-        rootNode.Add("maxClients", new JSONData("1"));
+        rootNode.Add("maxClients", new JSONData("2"));
         rootNode.Add("turnTime", new JSONData("120"));
 
 

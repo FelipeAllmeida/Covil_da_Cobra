@@ -11,29 +11,22 @@ using System.ComponentModel;
 
 internal class GameController
 {
+
     public enum GameState
     {
-        REQUEST_PLAYER_NUMBER,
-        CAN_START
+        CONNECTING_PLAYERS,
+        CHOOSING_TEAM,
+        START_GAME
     }
 
-    //public enum GameState
-    //{
-    //   // [Description("REQUEST_PLAYER_NUMBER")]
-    //    REQUEST_PLAYER_NUMBER
-    //}
+    public GameState CURRENT_STATE = GameState.CONNECTING_PLAYERS;
 
-
-    //  private GameState _currentGameState;//= GameState.REQUEST_PLAYER_NUMBER;
-
-    //string P1;
-    //string P2;
 
     struct PlayerOne
     {
         public string Name;
         public string IDCliente;
-        public char Team;
+        public string Team;
 
 
         public int MeeleId;
@@ -59,7 +52,7 @@ internal class GameController
     {
         public string Name;
         public string IDCliente;
-        public char Team;
+        public string Team;
 
         public int MeeleId;
         public int MeeleAP;
@@ -84,11 +77,13 @@ internal class GameController
     PlayerOne P1;
     PlayerTwo P2;
 
-    int _PlayersConnected = 0;
+    public int _PlayersConnected = 0;
+    public int _PlayersReady = 0;
 
 
-    public void PlayerOK(char Team, string idcliente)
+    public void PlayerTeam(string Team, string idcliente)
     {
+        _PlayersReady++;
         if (P1.IDCliente == idcliente)
         {
             P1.Team = Team;
@@ -96,19 +91,35 @@ internal class GameController
         else if (P2.IDCliente == idcliente)
         {
             P2.Team = Team;
+            CURRENT_STATE = GameState.START_GAME;
         }
     }
 
-    public void Players(string Name, string idcliente)
+
+    public void setIdOrder(string idCliente)
     {
         _PlayersConnected++;
         if (_PlayersConnected == 1)
         {
-            PlayerOneController(Name, idcliente);
+            PlayerOneController(string.Empty, idCliente);
         }
         else
         {
-            PlayerTwoController(Name, idcliente);
+            PlayerTwoController(string.Empty, idCliente);
+        }
+    }
+
+    public void JoinnedPlayers(string Name, string idcliente)
+    {
+
+        if (P1.IDCliente == idcliente)
+        {
+            P1.Name = Name;
+        }
+        else if (P2.IDCliente == idcliente)
+        {
+            P2.Name = Name;
+            CURRENT_STATE = GameState.CHOOSING_TEAM;
         }
 
     }
@@ -117,7 +128,7 @@ internal class GameController
     {
         P1.Name = Name;
         P1.IDCliente = idcliente;
-        P1.Team = 'X';
+        P1.Team = string.Empty;
 
         P1.MeeleId = 1;
         P1.MeeleAP = 5;
@@ -143,7 +154,7 @@ internal class GameController
     {
         P2.Name = Name;
         P2.IDCliente = idcliente;
-         P1.Team = 'X';
+        P1.Team = string.Empty;
 
         P2.MeeleId = 1;
         P2.MeeleAP = 5;
@@ -162,21 +173,6 @@ internal class GameController
         P2.MageAtk = 10;
         P2.MageDef = 2;
         P2.MageHP = 16;
-    }
-
-
-    int _nPlayers = 1;
-
-    public int get_nPlayer()
-    {
-        int newPlayer = _nPlayers;
-        _nPlayers++;
-        return newPlayer;
-    }
-
-    public bool CanStart()
-    {
-        return P1.Team != 'X' ;//&& P2.Team != 'X';
     }
 
 

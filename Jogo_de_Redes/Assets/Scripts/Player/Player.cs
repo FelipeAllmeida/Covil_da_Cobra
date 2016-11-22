@@ -28,7 +28,7 @@ public class Player : MonoBehaviour
 
         grass_red = (Material)Resources.Load("grass_red", typeof(Material));
 
-        if (this.name == "Guerreiro" || this.name == "Barbaro")
+        if (this.name == "Barbaro")
         {
             ActionPoints = 5;
             Atk = 5;
@@ -36,7 +36,7 @@ public class Player : MonoBehaviour
             HP = 20;
             BtnF = "F1";
         }
-        else if (this.name == "Arqueiro" || this.name == "Ranger")
+        else if ( this.name == "Ranger")
         {
             ActionPoints = 15;
             Atk = 8;

@@ -210,37 +210,37 @@ class Server : GameController
             //Se for ENUM
             if (isEnum)
             {
-                GameState __responseENUM = (GameState)Enum.Parse(typeof(GameState), __response);
-                switch (__responseENUM)
-                {
+                //GameState __responseENUM = (GameState)Enum.Parse(typeof(GameState), __response);
+                //switch (__responseENUM)
+                //{
 
-                    case GameState.REQUEST_PLAYER_NUMBER:
-                        StreamToClients(get_nPlayer().ToString());
-                        break;
-                    case GameState.CAN_START:
-                        if (CanStart())
-                        {
-                            StreamToClients(GameBegin());
-                        }
-                        break;
-                }
+                //    case GameState.REQUEST_PLAYER_NUMBER:
+                //        StreamToClients(get_nPlayer().ToString());
+                //        break;
+                //    case GameState.CAN_START:
+                //        if (CanStart())
+                //        {
+                //            StreamToClients(GameBegin());
+                //        }
+                //        break;
+                //}
             }
             //Se for Dados
             else
             {
-                __response = __response.Substring(1, __response.Length - 1);
-                if ((_listClients.Count - 1) < _maxClients)
-                {
-                    Players(__response, cliente.id);
-                }
-                else
-                {
-                    PlayerOK(char.Parse(__response), cliente.id);
-                    if (CanStart())
-                    {
-                        StreamToClients("START");
-                    }
-                }
+                //__response = __response.Substring(1, __response.Length - 1);
+                //if ((_listClients.Count - 1) < _maxClients)
+                //{
+                //    Players(__response, cliente.id);
+                //}
+                //else
+                //{
+                //    PlayerOK(char.Parse(__response), cliente.id);
+                //    if (CanStart())
+                //    {
+                //        StreamToClients("START");
+                //    }
+                //}
 
 
             }

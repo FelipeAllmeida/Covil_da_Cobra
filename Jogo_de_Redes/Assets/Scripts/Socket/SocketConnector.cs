@@ -5,6 +5,16 @@ using System.Collections;
 
 public class SocketConnector
 {
+
+    public enum GameState
+    {
+        LOBBY_ROOM = 1,
+        CAN_START = 2
+
+    }
+
+    //  GameController _GameController = new GameController()
+
     #region Event Data
     public event Action<string> onSocketResponse;
     #endregion
@@ -12,6 +22,8 @@ public class SocketConnector
     #region Private Data
     private TCPConnector _tcpConnection;
     private GameController _GameController;
+    //private GameState __responseENUM;
+
 
     private bool _isConnected = false;
     private bool _isReading = false;
@@ -22,7 +34,6 @@ public class SocketConnector
     public void AInitialize()
     {
         _tcpConnection = new TCPConnector();
-        _GameController = new GameController();
     }
 
     public void ApplicationQuitHandler()
@@ -88,17 +99,29 @@ public class SocketConnector
             string __response = _tcpConnection.ReceiveData();
             if (__response != string.Empty)
             {
-                //  Debug.Log("Socket response: " + __response);
+
                 GlobalVariables.IS_SERVER_READY = true;
 
-                int start = 0;
-                var begin = int.TryParse(__response, out start);
-                if (begin && start == 1)
+
+                int _en = 0;
+                if (int.TryParse(__response, out _en))
                 {
-                    GlobalVariables.WAITING = true;
+                    GameState __responseENUM = (GameState)_en;
+
+                    switch (__responseENUM)
+                    {
+
+                        case GameState.LOBBY_ROOM:
+                            GlobalVariables.WAITING = true;
+                            break;
+                        case GameState.CAN_START:
+                            GlobalVariables.START = true;
+                            break;
+                    }
                 }
 
                 GlobalVariables._SERVER_RESPONSE = __response;
+
 
                 if (onSocketResponse != null)
                     onSocketResponse(__response);

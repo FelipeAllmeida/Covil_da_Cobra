@@ -28,3 +28,9 @@ C:\Intel\Nova pasta\Covil_da_Cobra2\Jogo_de_Redes2\Assets\Resources\ConsoleAppli
 C:\Intel\Nova pasta\Covil_da_Cobra2\Jogo_de_Redes2\Assets\Resources\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
 C:\Intel\Nova pasta\Covil_da_Cobra2\Jogo_de_Redes2\Assets\Resources\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
 C:\Intel\Nova pasta\Covil_da_Cobra2\Jogo_de_Redes2\Assets\Resources\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache
+C:\Intel\Covil_da_Cobra\trunk\Jogo_de_Redes\Assets\Resources\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
+C:\Intel\Covil_da_Cobra\trunk\Jogo_de_Redes\Assets\Resources\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
+C:\Intel\Covil_da_Cobra\trunk\Jogo_de_Redes\Assets\Resources\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb
+C:\Intel\Covil_da_Cobra\trunk\Jogo_de_Redes\Assets\Resources\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
+C:\Intel\Covil_da_Cobra\trunk\Jogo_de_Redes\Assets\Resources\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+C:\Intel\Covil_da_Cobra\trunk\Jogo_de_Redes\Assets\Resources\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache
