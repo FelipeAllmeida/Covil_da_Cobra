@@ -12,6 +12,7 @@ public class Lobby : MonoBehaviour
 
     public Text _text_MsgWating;
 
+    public Button _button_ReadyButton;
     public Button _button_RedTeam;
     public Button _button_BlueTeam;
 
@@ -51,7 +52,7 @@ public class Lobby : MonoBehaviour
         public string PlayerName;
         public string EnumRequst;
         public bool PlayerReady;
-        public char TeamChosen;
+        public string TeamChosen;
     }
     ConnectionData _ConnectionData = new ConnectionData();
 
@@ -73,11 +74,8 @@ public class Lobby : MonoBehaviour
                     {
                         //mensagem de espera de outro jogador
                         _text_MsgWating.enabled = true;
-                        _ConnectionData.PlayerName = _input_PlayerName.text;
                         _text_DisplayPlayerName.text = _input_PlayerName.text;
                         GlobalVariables.Player_Name = _input_PlayerName.text;
-                        GlobalVariables.__socket.SendData(JsonUtility.ToJson(_ConnectionData));
-
                     },
                 //fail
                     delegate
@@ -98,22 +96,25 @@ public class Lobby : MonoBehaviour
 
     public void PlayerReady()
     {
+        _button_ReadyButton.interactable = false;
+
         _ConnectionData.PlayerReady = true;
         _ConnectionData.TeamChosen = GlobalVariables.Player_Team_Chosen;
+        _ConnectionData.PlayerName = _input_PlayerName.text;
         GlobalVariables.__socket.SendData(JsonUtility.ToJson(_ConnectionData));
         GlobalVariables.__socket.StartReadSocketDataThread();
     }
 
     public void BlueTeam()
     {
-        GlobalVariables.Player_Team_Chosen = 'A';
+        GlobalVariables.Player_Team_Chosen = "A";
         _button_BlueTeam.interactable = false;
         _button_RedTeam.interactable = true;
     }
 
     public void ReadTeam()
     {
-        GlobalVariables.Player_Team_Chosen = 'V';
+        GlobalVariables.Player_Team_Chosen = "V";
         _button_RedTeam.interactable = false;
         _button_BlueTeam.interactable = true;
     }

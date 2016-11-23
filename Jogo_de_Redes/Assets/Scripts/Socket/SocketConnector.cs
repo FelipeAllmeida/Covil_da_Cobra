@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SocketConnector
 {
@@ -9,8 +10,10 @@ public class SocketConnector
     public enum GameState
     {
         LOBBY_ROOM = 1,
-        CAN_START = 2
+        CAN_START = 2,
 
+        WAITING_PLAYERS_TURN = 3,
+        DO_TURN = 4
     }
 
     //  GameController _GameController = new GameController()
@@ -110,14 +113,28 @@ public class SocketConnector
 
                     switch (__responseENUM)
                     {
-
                         case GameState.LOBBY_ROOM:
                             GlobalVariables.WAITING = true;
                             break;
                         case GameState.CAN_START:
                             GlobalVariables.START = true;
                             break;
+                        case GameState.WAITING_PLAYERS_TURN:
+                            GlobalVariables.WAITING_PLAYERS_TURN = true;
+                            break;
                     }
+                }
+                //se nao retornar um estado para o jogo, retorna a lista de acoes calculadas
+                else
+                {
+                    GlobalVariables.DO_TURN = true;
+                    var p_JsonResponse = SimpleJSON.JSON.Parse(__response);
+                    var a = p_JsonResponse;
+                    var b = a;
+                    var response = JsonUtility.FromJson(__response, typeof(string));
+                  
+
+                   
                 }
 
                 GlobalVariables._SERVER_RESPONSE = __response;

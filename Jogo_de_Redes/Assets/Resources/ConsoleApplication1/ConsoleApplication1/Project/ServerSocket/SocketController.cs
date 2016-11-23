@@ -21,6 +21,7 @@ class SocketController : GameController
     private TcpListener _tcpListener;                       // Escuta as conexões tcps dos clientes
 
     private Thread _threadClientAcception;                  // Rêferencia a thread da aceitação de clientes
+    private Thread _threadGameLoop;                         // Rêferencia a thread de gameLoop 
 
     private List<Thread> _listClientWaitForResponseThreads; // Lista com a referência as thread de espera de resposta dos clients
 
@@ -68,6 +69,8 @@ class SocketController : GameController
             _isServerRunning = true;
             _isAcceptingNewClients = true;
             _tcpListener.Start();
+
+
             if (p_callbackSuccess != null) p_callbackSuccess();
         }
         catch (SocketException p_socketException)
@@ -75,6 +78,25 @@ class SocketController : GameController
             Console.WriteLine("SocketException: {0}", p_socketException);
             if (p_callbackFailed != null) p_callbackFailed();
         }
+    }
+
+    public void ServGameLoop(Action p_callbackFinish)
+    {
+        //Responde os calculos para todos
+        Action p_callbackResponseTurn = delegate
+        {
+            for (int i = 0; i < listClients.Count; i++)
+            {
+                SocketController.ClientData __clientData = listClients[i];
+                __clientData.clientToSendResponse = ListToSend.ToString();
+                listClients[listClients.FindIndex(x => x.id == __clientData.id)] = __clientData;
+            }
+            StreamToClients(p_callbackFinish);
+           // ServGameLoop((Action)p_callbackFinish);
+        };
+
+        _threadGameLoop = new Thread(new ParameterizedThreadStart(GameLoop));
+        _threadGameLoop.Start(p_callbackResponseTurn);
     }
 
     //Para o socket, o mesmo não irá mais receber dados e irá perder a referência aos seus Clients
@@ -110,6 +132,8 @@ class SocketController : GameController
 
                 if ((Action)p_callbackFinish != null) ((Action)p_callbackFinish)();
 
+
+
                 //* ---> Novo
                 //lobby de espera
                 for (int i = 0; i < listClients.Count; i++)
@@ -129,6 +153,7 @@ class SocketController : GameController
                 //* ---> Novo
                 //set idPlayer 1/2
                 setIdOrder(__clientData.id);
+
 
                 listClients.Add(__clientData);
                 Console.WriteLine("New Client connected, {0} of {1}\n", listClients.Count, _maxClients);
@@ -176,44 +201,91 @@ class SocketController : GameController
             //* ---> Novo
 
             /////JSON
-            var p_JsonResponse = JSON.Parse(__response);
-            bool PlayerReady = p_JsonResponse["PlayerReady"].AsBool;
-            string PlayerName = p_JsonResponse["PlayerName"].Value;
-            string TeamChoisen = p_JsonResponse["TeamChoisen"].Value;
-
             string p_playerID = listClients[listClients.FindIndex(x => x.id == p_clientData.id)].id;
+            var p_JsonResponse = JSON.Parse(__response);
 
-            //Se os jogadores estao conectando - procura pelo o id e seta o nome
-            if (CURRENT_STATE == GameState.CONNECTING_PLAYERS)
+            ////request do turno
+            //int _en = 0;
+            //if (int.TryParse(__response, out _en))
+            //{
+            //    CURRENT_STATE = GameState.REQUEST_TURN;
+            //}
+
+            //else
+            //{
+
+            if (CURRENT_STATE == GameState.ON)
             {
-                if (_PlayersConnected < 2)
+                string getResponse = GameLogic(p_playerID, __response);
+                //RESPONDE PARA O CLIENTE QUE ESTA ESPERANDO O OUTRO JOGADOR
+
+                if (getResponse != null)
                 {
-                    JoinnedPlayers(PlayerName, p_playerID);
+                    for (int i = 0; i < listClients.Count; i++)
+                    {
+                        SocketController.ClientData __clientData = listClients[i];
+                        if (__clientData.id == p_playerID)
+                        {
+                            __clientData.clientToSendResponse = "3";
+                            Console.WriteLine("Dados recebidos do turno : Player " + p_playerID);
+                            listClients[listClients.FindIndex(x => x.id == __clientData.id)] = __clientData;
+                            StreamToClients(p_callbackFinish);
+                        }
+                    }
                 }
+
             }
 
-                //se os jogadores estao no lobby para escolher time
-            else if (CURRENT_STATE == GameState.CHOOSING_TEAM)
+            if (CURRENT_STATE == GameState.REQUEST_TURN)
             {
-                if (_PlayersReady < 2)
-                {
-                    PlayerTeam(TeamChoisen, p_playerID);
-                }
+                ServGameLoop((Action)p_callbackFinish);
             }
-
-                      //se os jogadores estao prontos para iniciar
-            else if (CURRENT_STATE == GameState.START_GAME)
+            else
             {
-                for (int i = 0; i < listClients.Count; i++)
-                {
-                    SocketController.ClientData __clientData = listClients[i];
-                    //pronto pra comecar
-                    __clientData.clientToSendResponse = "2";
-                    listClients[listClients.FindIndex(x => x.id == __clientData.id)] = __clientData;
-                }
-                StreamToClients(p_callbackFinish);
-            }
 
+                bool PlayerReady = p_JsonResponse["PlayerReady"].AsBool;
+                string PlayerName = p_JsonResponse["PlayerName"].Value;
+                string TeamChosen = p_JsonResponse["TeamChosen"].Value;
+
+                //Se os jogadores estao conectando - procura pelo o id e seta o nome
+                if (CURRENT_STATE == GameState.CONNECTING_PLAYERS)
+                {
+                    if (_PlayersConnected < 1)
+                    {
+                        JoinnedPlayers(PlayerName, p_playerID);
+                    }
+                }
+
+                    //se os jogadores estao no lobby para escolher time
+                else if (CURRENT_STATE == GameState.CHOOSING_TEAM)
+                {
+                    if (_PlayersReady < 1)
+                    {
+                        PlayerTeam(TeamChosen, p_playerID);
+                    }
+                }
+
+
+
+                //se os jogadores estao prontos para iniciar
+                if (CURRENT_STATE == GameState.START_GAME)
+                {
+                    for (int i = 0; i < listClients.Count; i++)
+                    {
+                        SocketController.ClientData __clientData = listClients[i];
+                        //pronto pra comecar
+                        __clientData.clientToSendResponse = "2";
+                        listClients[listClients.FindIndex(x => x.id == __clientData.id)] = __clientData;
+                    }
+                    StreamToClients(p_callbackFinish);
+
+
+                    CURRENT_STATE = GameState.ON;
+                    // ServGameLoop((Action)p_callbackFinish);
+                    GameLogic();
+                }
+
+            }
             //* ---> Novo
 
 

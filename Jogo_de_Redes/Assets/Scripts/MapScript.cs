@@ -86,7 +86,7 @@ public class MapScript : MonoBehaviour
 
                 newTile.GetComponent<Renderer>().material.color = Color.green;
 
-                GlobalVariables.TilesEmJogo.Add(newTile);
+                GlobalVariables.AllTilesInGame.Add(newTile);
             }
         }
 

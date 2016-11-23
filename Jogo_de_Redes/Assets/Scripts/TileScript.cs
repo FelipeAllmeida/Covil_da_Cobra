@@ -16,7 +16,7 @@ public class TileScript : MonoBehaviour
     {
         _player = GameObject.FindGameObjectsWithTag("Player");
 
-        GlobalVariables.ListaPersonagens = _player;
+        GlobalVariables._CharactersList = _player;
     }
 
     void Update()
@@ -26,7 +26,7 @@ public class TileScript : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (GlobalVariables.personagemSelecionado != null)
+        if (GlobalVariables._selectedCharacter != null)
         {
             //resposta do servidor
             //foreach (var item in player)
@@ -45,9 +45,9 @@ public class TileScript : MonoBehaviour
                 {
 
 
-                    foreach (var per in GlobalVariables.ListaPersonagens)
+                    foreach (var per in GlobalVariables._CharactersList)
                     {
-                        if (per.name == GlobalVariables.personagemSelecionado)
+                        if (per.name == GlobalVariables._selectedCharacter)
                         {
                             _CanWalk = true;
                             _CanAtk = true;
@@ -91,16 +91,31 @@ public class TileScript : MonoBehaviour
                     {
 
 
-                        GlobalVariables.GlobalTileColisor[GlobalVariables.personagemSelecionado] = this.name;
+                        GlobalVariables.GlobalTileColisor[GlobalVariables._selectedCharacter] = this.name;
 
-                        GlobalVariables.tilesAcoes.Add(this.transform);
-                        foreach (var til in GlobalVariables.tilesAcoes)
+                        GlobalVariables.AllActionTiles.Add(this.transform);
+
+
+                        if (GlobalVariables._selectedCharacter == "Guerreiro" || GlobalVariables._selectedCharacter == "Barbaro")
+                        {
+                            GlobalVariables.ActionMageDef.Add(this.transform);
+                        }
+                        else if (GlobalVariables._selectedCharacter == "Arqueiro" || GlobalVariables._selectedCharacter == "Ranger")
+                        {
+                            GlobalVariables.ActionRangeDef.Add(this.transform);
+                        }
+                        else
+                        {
+                            GlobalVariables.ActionMageDef.Add(this.transform);
+                        }
+
+                        foreach (var til in GlobalVariables.AllActionTiles)
                         {
                             til.GetComponent<Renderer>().material.color = Color.red;
                         }
                         GlobalVariables.PlayerDef = false;
 
-                        var ultTile = GlobalVariables.UltimoTileSelecionado[GlobalVariables.personagemSelecionado];
+                        var ultTile = GlobalVariables.LastTileSelected[GlobalVariables._selectedCharacter];
                         var scr = ultTile.GetComponent<TileScript>();
                         scr.OnMouseDown();
 
@@ -110,17 +125,31 @@ public class TileScript : MonoBehaviour
                     if (_CanAtk && GlobalVariables.PlayerAtk)
                     {
 
-                        GlobalVariables.GlobalTileColisor[GlobalVariables.personagemSelecionado] = this.name;
+                        GlobalVariables.GlobalTileColisor[GlobalVariables._selectedCharacter] = this.name;
 
-                        GlobalVariables.tilesAcoes.Add(this.transform);
-                        foreach (var til in GlobalVariables.tilesAcoes)
+                        GlobalVariables.AllActionTiles.Add(this.transform);
+
+                        if (GlobalVariables._selectedCharacter == "Guerreiro" || GlobalVariables._selectedCharacter == "Barbaro")
+                        {
+                            GlobalVariables.ActionMeeleAtk.Add(this.transform);
+                        }
+                        else if (GlobalVariables._selectedCharacter == "Arqueiro" || GlobalVariables._selectedCharacter == "Ranger")
+                        {
+                            GlobalVariables.ActionRangeAtk.Add(this.transform);
+                        }
+                        else
+                        {
+                            GlobalVariables.ActionMageAtk.Add(this.transform);
+                        }
+
+                        foreach (var til in GlobalVariables.AllActionTiles)
                         {
                             til.GetComponent<Renderer>().material.color = new Color32(255, 0, 255, 0);
                         }
                         GlobalVariables.PlayerAtk = false;
 
 
-                        var ultTile = GlobalVariables.UltimoTileSelecionado[GlobalVariables.personagemSelecionado];
+                        var ultTile = GlobalVariables.LastTileSelected[GlobalVariables._selectedCharacter];
                         var scr = ultTile.GetComponent<TileScript>();
                         scr.OnMouseDown();
                     }
@@ -129,10 +158,10 @@ public class TileScript : MonoBehaviour
                     if (_CanWalk && !GlobalVariables.PlayerAtk && !GlobalVariables.PlayerDef)
                     {
 
-                        GlobalVariables.GlobalTileColisor[GlobalVariables.personagemSelecionado] = this.name;
+                        GlobalVariables.GlobalTileColisor[GlobalVariables._selectedCharacter] = this.name;
 
-                        var valorX = GlobalVariables.GlobalTileColisor[GlobalVariables.personagemSelecionado].Substring(1, 2);
-                        var valorY = GlobalVariables.GlobalTileColisor[GlobalVariables.personagemSelecionado].Substring(3, 2);
+                        var valorX = GlobalVariables.GlobalTileColisor[GlobalVariables._selectedCharacter].Substring(1, 2);
+                        var valorY = GlobalVariables.GlobalTileColisor[GlobalVariables._selectedCharacter].Substring(3, 2);
 
                         var tile = "S" + valorX + valorY;
 
@@ -141,21 +170,21 @@ public class TileScript : MonoBehaviour
                         List<Transform> tilesParaPintar = new List<Transform>();
 
                         //voltar a cor original
-                        foreach (var item in GlobalVariables.TilesEmJogo)
+                        foreach (var item in GlobalVariables.AllTilesInGame)
                         {
                             item.GetComponent<Renderer>().material.color = Color.green;
                         }
 
                         //pintar
-                        foreach (var item in GlobalVariables.TilesEmJogo)
+                        foreach (var item in GlobalVariables.AllTilesInGame)
                         {
                             if (item.ToString().Substring(0, 5) == tile)
                             {
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont]);
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + 1]);
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - 1]);
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + 30]);
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - 30]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + 1]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - 1]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + 30]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - 30]);
                             }
                             cont++;
                         }
@@ -168,18 +197,32 @@ public class TileScript : MonoBehaviour
                             }
                         }
 
-                        GlobalVariables.tilesCaminhados.Add(this.transform);
-                        foreach (var til in GlobalVariables.tilesCaminhados)
+                        GlobalVariables.AllWalkedTiles.Add(this.transform);
+
+                        if (GlobalVariables._selectedCharacter == "Guerreiro" || GlobalVariables._selectedCharacter == "Barbaro")
+                        {
+                            GlobalVariables.WalkedMeele.Add(this.transform);
+                        }
+                        else if (GlobalVariables._selectedCharacter == "Arqueiro" || GlobalVariables._selectedCharacter == "Ranger")
+                        {
+                            GlobalVariables.WalkedRange.Add(this.transform);
+                        }
+                        else
+                        {
+                            GlobalVariables.WalkedMage.Add(this.transform);
+                        }
+
+                        foreach (var til in GlobalVariables.AllWalkedTiles)
                         {
                             til.GetComponent<Renderer>().material.color = new Color32(102, 0, 102, 0);
                         }
 
-                        foreach (var til in GlobalVariables.tilesAcoes)
+                        foreach (var til in GlobalVariables.AllActionTiles)
                         {
                             til.GetComponent<Renderer>().material.color = new Color32(255, 0, 255, 0);
                         }
 
-                        GlobalVariables.UltimoTileSelecionado[GlobalVariables.personagemSelecionado] = this.transform;
+                        GlobalVariables.LastTileSelected[GlobalVariables._selectedCharacter] = this.transform;
                     }
                 }
             }

@@ -149,7 +149,8 @@ namespace SimpleJSON
 
         public virtual JSONBinaryTag Tag
         {
-            get; set;
+            get;
+            set;
         }
 
         public virtual int AsInt
@@ -633,7 +634,7 @@ namespace SimpleJSON
                     {
                         int count = aReader.ReadInt32();
                         JSONArray tmp = new JSONArray();
-                        for (int i = 0;i < count;i++)
+                        for (int i = 0; i < count; i++)
                             tmp.Add(Deserialize(aReader));
                         return tmp;
                     }
@@ -641,7 +642,7 @@ namespace SimpleJSON
                     {
                         int count = aReader.ReadInt32();
                         JSONClass tmp = new JSONClass();
-                        for (int i = 0;i < count;i++)
+                        for (int i = 0; i < count; i++)
                         {
                             string key = aReader.ReadString();
                             var val = Deserialize(aReader);
@@ -871,7 +872,7 @@ namespace SimpleJSON
         {
             aWriter.Write((byte)JSONBinaryTag.Array);
             aWriter.Write(m_List.Count);
-            for (int i = 0;i < m_List.Count;i++)
+            for (int i = 0; i < m_List.Count; i++)
             {
                 m_List[i].Serialize(aWriter);
             }

@@ -11,6 +11,8 @@ public class Player : MonoBehaviour
     public int Def = 10;
     public int HP = 10;
 
+    public string CurrentTile;
+
     private GameObject objMap;
     MapScript scriptMap;
 
@@ -22,22 +24,31 @@ public class Player : MonoBehaviour
 
     string Acao = "Movendo";
 
-    bool Attacking = false;
+    bool Acting = false;
+
+
+    //  public CharactersModel _character = new CharactersModel();
+
+
     void Start()
     {
 
         grass_red = (Material)Resources.Load("grass_red", typeof(Material));
 
-        if (this.name == "Barbaro")
+        if (this.name == "Barbaro" || this.name == "Guerreiro")
         {
+            CurrentTile = this.name == "Barbaro" ? "S1122" : "S1808";
+
             ActionPoints = 5;
             Atk = 5;
             Def = 10;
             HP = 20;
             BtnF = "F1";
         }
-        else if ( this.name == "Ranger")
+        else if (this.name == "Ranger" || this.name == "Arqueiro")
         {
+            CurrentTile = this.name == "Ranger" ? "S0922" : "S2008";
+
             ActionPoints = 15;
             Atk = 8;
             Def = 4;
@@ -46,6 +57,8 @@ public class Player : MonoBehaviour
         }
         else
         {
+            CurrentTile = this.name == "Shaman" ? "S0722" : "S2208";
+
             ActionPoints = 10;
             Atk = 10;
             Def = 2;
@@ -80,7 +93,7 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (this.ActionPoints == 0)
+        if (this.ActionPoints == 0 && GlobalVariables.ClassAction[this.name] == true)
         {
             GlobalVariables.ClassAction[this.name] = false;
         }
@@ -91,7 +104,7 @@ public class Player : MonoBehaviour
     {
         TileColisor = col.gameObject.name;
         GlobalVariables.GlobalTileColisor[this.name] = col.gameObject.name;
-        GlobalVariables.UltimoTileSelecionado[this.name] = col.gameObject.transform;
+        GlobalVariables.LastTileSelected[this.name] = col.gameObject.transform;
         GlobalVariables.ClassAction[this.name] = true;
 
     }
@@ -100,7 +113,7 @@ public class Player : MonoBehaviour
     void OnGUI()
     {
 
-        if (GlobalVariables.personagemSelecionado == this.name)
+        if (GlobalVariables._selectedCharacter == this.name)
         {
             Vector3 coords = GlobalVariables.Cameras[GlobalVariables.currentCameraIndex].WorldToScreenPoint(this.transform.position);
             Rect r = new Rect(coords.x, Screen.height - coords.y - 100, 100, 50);
@@ -127,7 +140,7 @@ public class Player : MonoBehaviour
 
 
             GUI.Box(new Rect(0, 0, 90, 70),
-                GlobalVariables.personagemSelecionado + "    " + BtnF + "\n" +
+                GlobalVariables._selectedCharacter + "    " + BtnF + "\n" +
                 "HP : " + HP.ToString() + "\n" +
                 "ATK : " + Atk.ToString() + "\n" +
                 "DEF : " + Def.ToString() + "\n" +
@@ -144,7 +157,7 @@ public class Player : MonoBehaviour
 
         ///////DEEEEEEEEEEEEEEEEEEEEFFF
 
-        if (this.name == GlobalVariables.personagemSelecionado)
+        if (this.name == GlobalVariables._selectedCharacter)
         {
 
             var valorX = GlobalVariables.GlobalTileColisor[this.name].Substring(1, 2);// int.Parse(GlobalVariables.GlobalTileColisor[this.name].Substring(1, 2), NumberStyles.Any);
@@ -156,15 +169,15 @@ public class Player : MonoBehaviour
 
             List<Transform> tilesParaPintar = new List<Transform>();
 
-            foreach (var item in GlobalVariables.TilesEmJogo)
+            foreach (var item in GlobalVariables.AllTilesInGame)
             {
                 if (item.ToString().Substring(0, 5) == tile)
                 {
-                    tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont]);
-                    tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + 1]);
-                    tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - 1]);
-                    tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + 30]);
-                    tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - 30]);
+                    tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont]);
+                    tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + 1]);
+                    tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - 1]);
+                    tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + 30]);
+                    tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - 30]);
                 }
                 cont++;
             }
@@ -174,12 +187,12 @@ public class Player : MonoBehaviour
                 t.GetComponent<Renderer>().material.color = Color.black;
             }
 
-            foreach (var til in GlobalVariables.tilesCaminhados)
+            foreach (var til in GlobalVariables.AllWalkedTiles)
             {
                 til.GetComponent<Renderer>().material.color = new Color32(102, 0, 102, 0);
             }
 
-            foreach (var til in GlobalVariables.tilesAcoes)
+            foreach (var til in GlobalVariables.AllActionTiles)
             {
                 til.GetComponent<Renderer>().material.color = new Color32(255, 0, 255, 0);
             }
@@ -192,7 +205,7 @@ public class Player : MonoBehaviour
 
         ///////ATTTTTTTTTTKKKKKKKKKKKKKKKKKKKK
 
-        if (this.name == GlobalVariables.personagemSelecionado)
+        if (this.name == GlobalVariables._selectedCharacter)
         {
 
             var valorX = GlobalVariables.GlobalTileColisor[this.name].Substring(1, 2);// int.Parse(GlobalVariables.GlobalTileColisor[this.name].Substring(1, 2), NumberStyles.Any);
@@ -204,29 +217,29 @@ public class Player : MonoBehaviour
 
             List<Transform> tilesParaPintar = new List<Transform>();
 
-            foreach (var item in GlobalVariables.TilesEmJogo)
+            foreach (var item in GlobalVariables.AllTilesInGame)
             {
                 if (item.ToString().Substring(0, 5) == tile)
                 {
-                    if (GlobalVariables.personagemSelecionado == "Guerreiro" || GlobalVariables.personagemSelecionado == "Barbaro")
+                    if (GlobalVariables._selectedCharacter == "Guerreiro" || GlobalVariables._selectedCharacter == "Barbaro")
                     {
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont]);
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + 1]);
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - 1]);
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + 30]);
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - 30]);
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont]);
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + 1]);
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - 1]);
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + 30]);
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - 30]);
                     }
-                    else if (GlobalVariables.personagemSelecionado == "Arqueiro" || GlobalVariables.personagemSelecionado == "Ranger")
+                    else if (GlobalVariables._selectedCharacter == "Arqueiro" || GlobalVariables._selectedCharacter == "Ranger")
                     {
                         Debug.Log("1");
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont]);
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont]);
 
 
                         for (int i = 1; i <= 5; i++)
                         {
                             if ((cont + i) <= 900)
                             {
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + i]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + i]);
                             }
                         }
                         Debug.Log("2");
@@ -235,7 +248,7 @@ public class Player : MonoBehaviour
                         {
                             if ((cont - i) >= 0)
                             {
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - i]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - i]);
                             }
                         }
 
@@ -245,7 +258,7 @@ public class Player : MonoBehaviour
                         {
                             if (((cont + mult + 30) <= 900) && (cont + i) <= 900)
                             {
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + mult]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + mult]);
                             }
                             mult += 30;
                         }
@@ -255,53 +268,64 @@ public class Player : MonoBehaviour
                         {
                             if (((cont + mult + 30) >= 0) && (cont - i) >= 0)
                             {
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - mult]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - mult]);
                             }
                             mult += 30;
                         }
                         Debug.Log("5");
                     }
+
+
                     /////MAGE
                     else
                     {
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont]);
+                        Debug.Log("1");
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont]);
 
-                        for (int i = 1; i <= 10; i++)
+                        int contMage = 30;
+
+                        for (int i = 1; i <= 5; i++)
                         {
-                            if ((cont + i) <= 900)
+                            if ((cont + i + contMage + 30 <= 900) && (cont + i) <= 900)
                             {
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + i]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + i + contMage]);
                             }
+                            contMage += 30;
+                        }
+                        Debug.Log("2");
+
+                        contMage = 30;
+                        for (int i = 1; i <= 5; i++)
+                        {
+                            if ((cont - i - contMage - 30 >= 0) && (cont - i) >= 0)
+                            {
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - i - contMage]);
+                            }
+                            contMage += 30;
                         }
 
-                        for (int i = 1; i <= 10; i++)
+                        contMage = 30;
+                        Debug.Log("3");
+                        for (int i = 1; i <= 5; i++)
                         {
-                            if ((cont - i) >= 0)
+                            if (((cont - i + contMage + 30) <= 900) && (cont + i) <= 900)
                             {
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - i]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - i + contMage]);
                             }
+                            contMage += 30;
                         }
+                        Debug.Log("4");
 
-                        int mult = 30;
-
-                        for (int i = 1; i <= 10; i++)
+                        contMage = 30;
+                        for (int i = 1; i <= 5; i++)
                         {
-                            if ((cont + i) <= 900)
+                            if (((cont + i - contMage - 30) >= 0) && (cont - i) >= 0)
                             {
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + mult]);
+                                tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + i - contMage]);
                             }
-                            mult += 30;
+                            contMage += 30;
                         }
-
-                        mult = 0;
-                        for (int i = 1; i <= 10; i++)
-                        {
-                            if ((cont - i) >= 0)
-                            {
-                                tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - mult]);
-                            }
-                            mult += 30;
-                        }
+                        Debug.Log("5");
                     }
                 }
                 cont++;
@@ -312,12 +336,12 @@ public class Player : MonoBehaviour
                 t.GetComponent<Renderer>().material.color = Color.red;
             }
 
-            foreach (var til in GlobalVariables.tilesCaminhados)
+            foreach (var til in GlobalVariables.AllWalkedTiles)
             {
                 til.GetComponent<Renderer>().material.color = new Color32(102, 0, 102, 0);
             }
 
-            foreach (var til in GlobalVariables.tilesAcoes)
+            foreach (var til in GlobalVariables.AllActionTiles)
             {
                 til.GetComponent<Renderer>().material.color = new Color32(255, 0, 255, 0);
             }
@@ -327,24 +351,24 @@ public class Player : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (GlobalVariables.personagemSelecionado != this.name)
+        if (GlobalVariables._selectedCharacter != this.name && !GlobalVariables.PlayerAtk && !GlobalVariables.PlayerDef)
         {
-            foreach (var t in GlobalVariables.TilesEmJogo)
+            foreach (var t in GlobalVariables.AllTilesInGame)
             {
                 t.GetComponent<Renderer>().material.color = Color.green;
             }
 
-            foreach (var til in GlobalVariables.tilesCaminhados)
+            foreach (var til in GlobalVariables.AllWalkedTiles)
             {
                 til.GetComponent<Renderer>().material.color = new Color32(102, 0, 102, 0);
             }
 
-            foreach (var til in GlobalVariables.tilesAcoes)
+            foreach (var til in GlobalVariables.AllActionTiles)
             {
                 til.GetComponent<Renderer>().material.color = Color.red;
             }
 
-            GlobalVariables.personagemSelecionado = this.name;
+            GlobalVariables._selectedCharacter = this.name;
         }
 
         if (GlobalVariables.ClassAction[this.name])
@@ -363,15 +387,15 @@ public class Player : MonoBehaviour
 
                 List<Transform> tilesParaPintar = new List<Transform>();
 
-                foreach (var item in GlobalVariables.TilesEmJogo)
+                foreach (var item in GlobalVariables.AllTilesInGame)
                 {
                     if (item.ToString().Substring(0, 5) == tile)
                     {
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont]);
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + 1]);
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - 1]);
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont + 30]);
-                        tilesParaPintar.Add(GlobalVariables.TilesEmJogo[cont - 30]);
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont]);
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + 1]);
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - 1]);
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont + 30]);
+                        tilesParaPintar.Add(GlobalVariables.AllTilesInGame[cont - 30]);
                     }
                     cont++;
                 }
@@ -380,6 +404,9 @@ public class Player : MonoBehaviour
                 {
                     t.GetComponent<Renderer>().material.color = Color.blue;
                 }
+
+
+
             }
 
 
