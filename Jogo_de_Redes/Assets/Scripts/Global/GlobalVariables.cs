@@ -58,6 +58,7 @@ public static class GlobalVariables
     public static string PlayerName;
     public static bool WAITING_PLAYERS_TURN = false;
     public static bool DO_TURN = false;
+    public static bool NEXT_TURN = false;
 
 
     public static SocketConnector __socket;

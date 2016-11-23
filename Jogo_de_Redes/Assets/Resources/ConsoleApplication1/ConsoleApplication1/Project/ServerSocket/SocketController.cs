@@ -204,16 +204,6 @@ class SocketController : GameController
             string p_playerID = listClients[listClients.FindIndex(x => x.id == p_clientData.id)].id;
             var p_JsonResponse = JSON.Parse(__response);
 
-            ////request do turno
-            //int _en = 0;
-            //if (int.TryParse(__response, out _en))
-            //{
-            //    CURRENT_STATE = GameState.REQUEST_TURN;
-            //}
-
-            //else
-            //{
-
             if (CURRENT_STATE == GameState.ON)
             {
                 string getResponse = GameLogic(p_playerID, __response);

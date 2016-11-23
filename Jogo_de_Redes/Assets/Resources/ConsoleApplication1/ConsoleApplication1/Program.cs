@@ -15,13 +15,13 @@ namespace ConsoleApplication1
             __server.Initialize(__socketData);
             __server.StartSocket(delegate
             {
-                Console.WriteLine("TUDO OK");
+                Console.WriteLine("SERVER ON");
                 __server.StartAcceptTcpClientThread(delegate
                 {
-                    Console.WriteLine("Clientes conectados");
+                    Console.WriteLine("ALL CLIENTS OK");
                     __server.StartWaitClientsStreamThread(delegate
                     {
-                        Console.WriteLine("Todos os dados recebidos");
+                        Console.WriteLine("ALL DATA RECEIVED");
                     });
                 });
             }, delegate

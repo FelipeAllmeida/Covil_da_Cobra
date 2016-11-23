@@ -35,12 +35,9 @@ public class Player : MonoBehaviour
     private bool _moved = false;
     public void MoveToTile(int id)
     {
-        if (this.id == id && GlobalVariables.Player_Team_Chosen == "A")
-        {
+        //BLUE
 
-        }
-
-        if (this.id == 1 || this.id == 4)
+        if (this.id == 1 && GlobalVariables.Player_Team_Chosen == "A")
         {
             foreach (var item in GlobalVariables.WalkedMeele)
             {
@@ -58,35 +55,27 @@ public class Player : MonoBehaviour
                 _moved = false;
             }
         }
-        if (this.id == 2 || this.id == 5)
+        else if (this.id == 1 && GlobalVariables.Player_Team_Chosen == "V")
         {
-            foreach (var item in GlobalVariables.WalkedRange)
+            foreach (var item in GlobalVariables.AllTilesInGame)
             {
-                while (!_moved)
+                if (this.CurrentTile == item.name)
                 {
-                    _timer += Time.deltaTime;
-                    if (_timer >= _duration)
-                    {
-                        _moved = true;
-                        this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
-                    }
+                    this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
                 }
-                _timer = 0f;
-                _duration = _duration + Time.deltaTime;
-                _moved = false;
             }
         }
-        if (this.id == 3 || this.id == 6)
-        {
-            foreach (var item in GlobalVariables.WalkedMage)
-            {
-                while (!_moved)
-                {
-                    _timer += Time.deltaTime;
-                    if (_timer >= _duration)
-                    {
-                        _moved = true;
 
+        else if (this.id == 2 && GlobalVariables.Player_Team_Chosen == "A")
+        {
+            foreach (var item in GlobalVariables.WalkedMeele)
+            {
+                while (!_moved)
+                {
+                    _timer += Time.deltaTime;
+                    if (_timer >= _duration)
+                    {
+                        _moved = true;
                         this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
                     }
                 }
@@ -95,6 +84,136 @@ public class Player : MonoBehaviour
                 _moved = false;
             }
         }
+        else if (this.id == 2 && GlobalVariables.Player_Team_Chosen == "V")
+        {
+            foreach (var item in GlobalVariables.AllTilesInGame)
+            {
+                if (this.CurrentTile == item.name)
+                {
+                    this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                }
+            }
+        }
+
+        else if (this.id == 3 && GlobalVariables.Player_Team_Chosen == "A")
+        {
+            foreach (var item in GlobalVariables.WalkedMeele)
+            {
+                while (!_moved)
+                {
+                    _timer += Time.deltaTime;
+                    if (_timer >= _duration)
+                    {
+                        _moved = true;
+                        this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                    }
+                }
+                _timer = 0f;
+                _duration = _duration + Time.deltaTime;
+                _moved = false;
+            }
+        }
+        else if (this.id == 3 && GlobalVariables.Player_Team_Chosen == "V")
+        {
+            foreach (var item in GlobalVariables.AllTilesInGame)
+            {
+                if (this.CurrentTile == item.name)
+                {
+                    this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                }
+            }
+        }
+
+
+        //RED
+        if (this.id == 4 && GlobalVariables.Player_Team_Chosen == "V")
+        {
+            foreach (var item in GlobalVariables.WalkedMeele)
+            {
+                while (!_moved)
+                {
+                    _timer += Time.deltaTime;
+                    if (_timer >= _duration)
+                    {
+                        _moved = true;
+                        this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                    }
+                }
+                _timer = 0f;
+                _duration = _duration + Time.deltaTime;
+                _moved = false;
+            }
+        }
+        else if (this.id == 4 && GlobalVariables.Player_Team_Chosen == "A")
+        {
+            foreach (var item in GlobalVariables.AllTilesInGame)
+            {
+                if (this.CurrentTile == item.name)
+                {
+                    this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                }
+            }
+        }
+
+        else if (this.id == 5 && GlobalVariables.Player_Team_Chosen == "V")
+        {
+            foreach (var item in GlobalVariables.WalkedMeele)
+            {
+                while (!_moved)
+                {
+                    _timer += Time.deltaTime;
+                    if (_timer >= _duration)
+                    {
+                        _moved = true;
+                        this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                    }
+                }
+                _timer = 0f;
+                _duration = _duration + Time.deltaTime;
+                _moved = false;
+            }
+        }
+        else if (this.id == 5 && GlobalVariables.Player_Team_Chosen == "A")
+        {
+            foreach (var item in GlobalVariables.AllTilesInGame)
+            {
+                if (this.CurrentTile == item.name)
+                {
+                    this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                }
+            }
+        }
+
+        else if (this.id == 6 && GlobalVariables.Player_Team_Chosen == "V")
+        {
+            foreach (var item in GlobalVariables.WalkedMeele)
+            {
+                while (!_moved)
+                {
+                    _timer += Time.deltaTime;
+                    if (_timer >= _duration)
+                    {
+                        _moved = true;
+                        this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                    }
+                }
+                _timer = 0f;
+                _duration = _duration + Time.deltaTime;
+                _moved = false;
+            }
+        }
+        else if (this.id == 6 && GlobalVariables.Player_Team_Chosen == "A")
+        {
+            foreach (var item in GlobalVariables.AllTilesInGame)
+            {
+                if (this.CurrentTile == item.name)
+                {
+                    this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                }
+            }
+        }
+
+
     }
 
 

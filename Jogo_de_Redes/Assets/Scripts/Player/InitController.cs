@@ -201,8 +201,17 @@ public class InitController : MonoBehaviour
                     }
                 }
             }
+            GlobalVariables.NEXT_TURN = true;
         }
 
+        if (GlobalVariables.NEXT_TURN)
+        {
+            foreach (var t in GlobalVariables.AllTilesInGame)
+            {
+                t.GetComponent<Renderer>().material.color = Color.green;
+            }
+            GlobalVariables.NEXT_TURN = false;
+        }
 
 
 

@@ -129,7 +129,7 @@ public class SocketConnector
                 {
                     GlobalVariables.DO_TURN = true;
 
-                    const int MaxLength = 500;
+                    const int MaxLength = 1000;
 
                     var removeTresh = __response;
                     if (removeTresh.Length > MaxLength)
@@ -137,9 +137,6 @@ public class SocketConnector
 
                     GlobalVariables._SERVER_RESPONSE = removeTresh;
                 }
-
-
-
 
 
                 if (onSocketResponse != null)
