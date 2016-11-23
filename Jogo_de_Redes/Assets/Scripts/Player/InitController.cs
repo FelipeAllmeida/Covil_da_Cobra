@@ -82,8 +82,6 @@ public class InitController : MonoBehaviour
 
                     if (character.name == "Barbaro" || character.name == "Guerreiro")
                     {
-                        _Character_Actions.id = 1;// character.name == "Barbaro" ? 4 : 1;
-
                         foreach (var walk in GlobalVariables.WalkedMeele)
                         {
                             _Character_Actions.WalkedTiles.Add(walk.name);
@@ -99,8 +97,6 @@ public class InitController : MonoBehaviour
                     }
                     else if (character.name == "Ranger" || character.name == "Arqueiro")
                     {
-                        _Character_Actions.id = 2;// character.name == "Ranger" ? 5 : 2;
-
                         foreach (var walk in GlobalVariables.WalkedRange)
                         {
                             _Character_Actions.WalkedTiles.Add(walk.name);
@@ -116,8 +112,6 @@ public class InitController : MonoBehaviour
                     }
                     else
                     {
-                        _Character_Actions.id = 3;// character.name == "Shaman" ? 6 : 3;
-
                         foreach (var walk in GlobalVariables.WalkedMage)
                         {
                             _Character_Actions.WalkedTiles.Add(walk.name);
@@ -135,6 +129,7 @@ public class InitController : MonoBehaviour
                     _Character_Actions.CurrentAP = PlayerScript.ActionPoints;
                     _Character_Actions.CurrentHP = PlayerScript.HP;
                     _Character_Actions.CurrentTile = PlayerScript.CurrentTile;
+                    _Character_Actions.id = PlayerScript.id;
 
                     ListToSend.Add(JsonUtility.ToJson(_Character_Actions));
                 }
@@ -144,11 +139,6 @@ public class InitController : MonoBehaviour
         GlobalVariables.__socket.StartReadSocketDataThread();
     }
 
-
-
-    [SerializeField]
-    private float _duration = 2f;
-    private float _timer = 0f;
     void Update()
     {
         if (GlobalVariables.DO_TURN && GlobalVariables.IS_SERVER_READY)
@@ -166,9 +156,7 @@ public class InitController : MonoBehaviour
 
                 Transform[] p_group;
 
-                p_group = GameObject.Find("BLUE_SNAKES_Controller").GetComponentsInChildren<Transform>();
-                //   p_group = GameObject.Find("RED_SNAKES_Controller").GetComponentsInChildren<Transform>();
-
+                p_group = GameObject.Find("RED_SNAKES_Controller").GetComponentsInChildren<Transform>();
                 foreach (Transform child in p_group)
                 {
                     for (int j = 0; j < child.childCount; j++)
@@ -176,8 +164,6 @@ public class InitController : MonoBehaviour
                         var character = child.GetChild(j);
                         if (character.tag == "Player")
                         {
-                            CharactersModel _Character_Actions = new CharactersModel();
-
                             Player PlayerScript = character.GetComponent<Player>();
 
                             if (PlayerScript.id == id)
@@ -186,7 +172,29 @@ public class InitController : MonoBehaviour
                                 PlayerScript.HP = CurrentHP;
                                 PlayerScript.ActionPoints = CurrentAP;
 
-                                PlayerScript.MoveToTile();
+                                PlayerScript.MoveToTile(id);
+                            }
+
+                        }
+                    }
+                }
+                p_group = GameObject.Find("BLUE_SNAKES_Controller").GetComponentsInChildren<Transform>();
+                foreach (Transform child in p_group)
+                {
+                    for (int j = 0; j < child.childCount; j++)
+                    {
+                        var character = child.GetChild(j);
+                        if (character.tag == "Player")
+                        {
+                            Player PlayerScript = character.GetComponent<Player>();
+
+                            if (PlayerScript.id == id)
+                            {
+                                PlayerScript.CurrentTile = CurrentTile;
+                                PlayerScript.HP = CurrentHP;
+                                PlayerScript.ActionPoints = CurrentAP;
+
+                                PlayerScript.MoveToTile(id);
                             }
 
                         }

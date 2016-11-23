@@ -236,8 +236,9 @@ class SocketController : GameController
 
             }
 
-            if (CURRENT_STATE == GameState.REQUEST_TURN)
+            if (P1.TurnSend && P2.TurnSend)
             {
+                CURRENT_STATE = GameState.REQUEST_TURN;
                 ServGameLoop((Action)p_callbackFinish);
             }
             else
@@ -250,7 +251,7 @@ class SocketController : GameController
                 //Se os jogadores estao conectando - procura pelo o id e seta o nome
                 if (CURRENT_STATE == GameState.CONNECTING_PLAYERS)
                 {
-                    if (_PlayersConnected < 1)
+                    if (_PlayersConnected < 2)
                     {
                         JoinnedPlayers(PlayerName, p_playerID);
                     }
@@ -259,7 +260,7 @@ class SocketController : GameController
                     //se os jogadores estao no lobby para escolher time
                 else if (CURRENT_STATE == GameState.CHOOSING_TEAM)
                 {
-                    if (_PlayersReady < 1)
+                    if (_PlayersReady < 2)
                     {
                         PlayerTeam(TeamChosen, p_playerID);
                     }

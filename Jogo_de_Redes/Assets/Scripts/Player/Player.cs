@@ -29,14 +29,70 @@ public class Player : MonoBehaviour
 
 
     //  public CharactersModel _character = new CharactersModel();
-
-    public void MoveToTile()
+    [SerializeField]
+    private float _duration = 1000f;//.5f;
+    private float _timer = 0f;
+    private bool _moved = false;
+    public void MoveToTile(int id)
     {
-        foreach (var item in GlobalVariables.AllTilesInGame)
+        if (this.id == id && GlobalVariables.Player_Team_Chosen == "A")
         {
-            if (item.name == CurrentTile)
+
+        }
+
+        if (this.id == 1 || this.id == 4)
+        {
+            foreach (var item in GlobalVariables.WalkedMeele)
             {
-                this.transform.position = item.transform.position;
+                while (!_moved)
+                {
+                    _timer += Time.deltaTime;
+                    if (_timer >= _duration)
+                    {
+                        _moved = true;
+                        this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                    }
+                }
+                _timer = 0f;
+                _duration = _duration + Time.deltaTime;
+                _moved = false;
+            }
+        }
+        if (this.id == 2 || this.id == 5)
+        {
+            foreach (var item in GlobalVariables.WalkedRange)
+            {
+                while (!_moved)
+                {
+                    _timer += Time.deltaTime;
+                    if (_timer >= _duration)
+                    {
+                        _moved = true;
+                        this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                    }
+                }
+                _timer = 0f;
+                _duration = _duration + Time.deltaTime;
+                _moved = false;
+            }
+        }
+        if (this.id == 3 || this.id == 6)
+        {
+            foreach (var item in GlobalVariables.WalkedMage)
+            {
+                while (!_moved)
+                {
+                    _timer += Time.deltaTime;
+                    if (_timer >= _duration)
+                    {
+                        _moved = true;
+
+                        this.transform.position = new Vector3(item.transform.position.x, this.transform.position.y, item.transform.position.z);
+                    }
+                }
+                _timer = 0f;
+                _duration = _duration + Time.deltaTime;
+                _moved = false;
             }
         }
     }
