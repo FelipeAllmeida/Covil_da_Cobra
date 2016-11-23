@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 public static class GlobalVariables
 {
-
+    public static Transform[] BLUE_TEAM ;//= GameObject.Find("BLUE_SNAKES_Controller").GetComponentsInChildren<Transform>();
+    public static Transform[] RED_TEAM ;//= GameObject.Find("RED_SNAKES_Controller").GetComponentsInChildren<Transform>();
 
 
     public static string _selectedCharacter;

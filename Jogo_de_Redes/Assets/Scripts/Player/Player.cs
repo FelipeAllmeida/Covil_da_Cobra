@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     public int Atk = 10;
     public int Def = 10;
     public int HP = 10;
+    public int id = 0;
 
     public string CurrentTile;
 
@@ -29,6 +30,17 @@ public class Player : MonoBehaviour
 
     //  public CharactersModel _character = new CharactersModel();
 
+    public void MoveToTile()
+    {
+        foreach (var item in GlobalVariables.AllTilesInGame)
+        {
+            if (item.name == CurrentTile)
+            {
+                this.transform.position = item.transform.position;
+            }
+        }
+    }
+
 
     void Start()
     {
@@ -38,6 +50,7 @@ public class Player : MonoBehaviour
         if (this.name == "Barbaro" || this.name == "Guerreiro")
         {
             CurrentTile = this.name == "Barbaro" ? "S1122" : "S1808";
+            id = this.name == "Barbaro" ? 4 : 1;
 
             ActionPoints = 5;
             Atk = 5;
@@ -48,6 +61,7 @@ public class Player : MonoBehaviour
         else if (this.name == "Ranger" || this.name == "Arqueiro")
         {
             CurrentTile = this.name == "Ranger" ? "S0922" : "S2008";
+            id = this.name == "Ranger" ? 5 : 2;
 
             ActionPoints = 15;
             Atk = 8;
@@ -58,6 +72,7 @@ public class Player : MonoBehaviour
         else
         {
             CurrentTile = this.name == "Shaman" ? "S0722" : "S2208";
+            id = this.name == "Shaman" ? 6 : 3;
 
             ActionPoints = 10;
             Atk = 10;

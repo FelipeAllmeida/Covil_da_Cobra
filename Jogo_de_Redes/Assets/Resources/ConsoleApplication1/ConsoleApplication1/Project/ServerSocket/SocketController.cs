@@ -92,7 +92,7 @@ class SocketController : GameController
                 listClients[listClients.FindIndex(x => x.id == __clientData.id)] = __clientData;
             }
             StreamToClients(p_callbackFinish);
-           // ServGameLoop((Action)p_callbackFinish);
+            // ServGameLoop((Action)p_callbackFinish);
         };
 
         _threadGameLoop = new Thread(new ParameterizedThreadStart(GameLoop));

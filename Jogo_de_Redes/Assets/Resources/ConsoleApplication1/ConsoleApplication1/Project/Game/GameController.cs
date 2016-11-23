@@ -111,6 +111,7 @@ internal class GameController
     public int _PlayersReady = 0;
 
     public SimpleJSON.JSONArray ListToSend = new SimpleJSON.JSONArray();
+    //public List<string> ListToSend = new List<string>();
     public void GameLoop(object p_callbackResponseTurn)
     {
 
@@ -157,6 +158,7 @@ internal class GameController
             if (P1.IDCliente == IDCLiente && !P1.TurnSend)
             {
                 ListToSend = new SimpleJSON.JSONArray();
+                //ListToSend = new List<string>();
 
                 var p_JsonResponseArray = JSONArray.Parse(_Turn).AsArray;
                 for (int i = 0; i < p_JsonResponseArray.Count; i++)
@@ -227,14 +229,47 @@ internal class GameController
                     //  string jsonString = javaScriptSerializer.Serialize(_char_response);
                     //ListToSend.Add(_char_response.ToString());
 
+                    //JSONData WalkedTiles = null;
+
+                    ////////////////
+
+                    /* JSONArray WalkedTiles = new JSONArray();
+                     if (_char_response.WalkedTiles.Count > 0)
+                     {
+                         foreach (var str in _char_response.WalkedTiles)
+                         {
+                             WalkedTiles.Add(str);
+                         }
+                     }
+                     rootNode.Add("WalkedTiles", new JSONData(WalkedTiles.ToString()));
+
+                     JSONArray ActionTilesAtk = new JSONArray();
+                     if (_char_response.ActionTilesAtk.Count > 0)
+                     {
+                         foreach (var str in _char_response.ActionTilesAtk)
+                         {
+                             ActionTilesAtk.Add(str);
+                         }
+                     }
+                     rootNode.Add("ActionTilesAtk", new JSONData(ActionTilesAtk.ToString()));
+
+                     JSONArray ActionTilesDef = new JSONArray();
+                     if (_char_response.ActionTilesDef.Count > 0)
+                     {
+                         foreach (var str in _char_response.ActionTilesDef)
+                         {
+                             ActionTilesDef.Add(str);
+                         }
+                     }
+                     rootNode.Add("ActionTilesDef", new JSONData(ActionTilesDef.ToString()));*/
+
+                    ////////////////
+
 
                     rootNode.Add("id", new JSONData(_char_response.id));
                     rootNode.Add("CurrentHP", new JSONData(_char_response.CurrentHP));
                     rootNode.Add("CurrentAP", new JSONData(_char_response.CurrentAP));
-                    rootNode.Add("ActionTilesDef", new JSONData(_char_response.ActionTilesDef.Count != 0 ? _char_response.ActionTilesDef.ToString() : string.Empty));
-                    rootNode.Add("ActionTilesDef", new JSONData(_char_response.ActionTilesAtk.Count != 0 ? _char_response.ActionTilesAtk.ToString() : string.Empty));
-                    rootNode.Add("ActionTilesDef", new JSONData(_char_response.WalkedTiles.Count != 0 ? _char_response.WalkedTiles.ToString() : string.Empty));
-                    rootNode.Add("CurrentTile", new JSONData(_char_response.CurrentTile != null ? _char_response.CurrentTile : string.Empty ));
+                    rootNode.Add("CurrentTile", new JSONData(_char_response.CurrentTile != null ? _char_response.CurrentTile.ToString() : string.Empty));
 
 
                     ListToSend.Add(rootNode);

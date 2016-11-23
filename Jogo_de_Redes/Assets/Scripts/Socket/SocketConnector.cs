@@ -128,21 +128,24 @@ public class SocketConnector
                 else
                 {
                     GlobalVariables.DO_TURN = true;
-                    var p_JsonResponse = SimpleJSON.JSON.Parse(__response);
-                    var a = p_JsonResponse;
-                    var b = a;
-                    var response = JsonUtility.FromJson(__response, typeof(string));
-                  
 
-                   
+                    const int MaxLength = 500;
+
+                    var removeTresh = __response;
+                    if (removeTresh.Length > MaxLength)
+                        removeTresh = removeTresh.Substring(0, MaxLength);
+
+                    GlobalVariables._SERVER_RESPONSE = removeTresh;
                 }
 
-                GlobalVariables._SERVER_RESPONSE = __response;
+
+
 
 
                 if (onSocketResponse != null)
                     onSocketResponse(__response);
             }
+
         }
     }
 

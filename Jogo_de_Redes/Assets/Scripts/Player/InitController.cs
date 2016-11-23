@@ -11,6 +11,8 @@ public class InitController : MonoBehaviour
     void Start()
     {
         GlobalVariables.Cameras = cameras;
+        GlobalVariables.BLUE_TEAM = GameObject.Find("BLUE_SNAKES_Controller").GetComponentsInChildren<Transform>();
+        GlobalVariables.RED_TEAM = GameObject.Find("RED_SNAKES_Controller").GetComponentsInChildren<Transform>();
 
         //desabilita todas cameras menos a padrao
         for (int i = 1; i < GlobalVariables.Cameras.Length; i++)
@@ -149,6 +151,54 @@ public class InitController : MonoBehaviour
     private float _timer = 0f;
     void Update()
     {
+        if (GlobalVariables.DO_TURN && GlobalVariables.IS_SERVER_READY)
+        {
+            GlobalVariables.IS_SERVER_READY = false;
+            var p_JsonResponse = SimpleJSON.JSON.Parse(GlobalVariables._SERVER_RESPONSE);
+            for (int i = 0; i < p_JsonResponse.Count; i++)
+            {
+                //p_JsonResponse[i]["id"].AsInt
+
+                int id = p_JsonResponse[i]["id"].AsInt;
+                int CurrentHP = p_JsonResponse[i]["CurrentHP"].AsInt;
+                int CurrentAP = p_JsonResponse[i]["CurrentAP"].AsInt;
+                string CurrentTile = p_JsonResponse[i]["CurrentTile"].Value;
+
+                Transform[] p_group;
+
+                p_group = GameObject.Find("BLUE_SNAKES_Controller").GetComponentsInChildren<Transform>();
+                //   p_group = GameObject.Find("RED_SNAKES_Controller").GetComponentsInChildren<Transform>();
+
+                foreach (Transform child in p_group)
+                {
+                    for (int j = 0; j < child.childCount; j++)
+                    {
+                        var character = child.GetChild(j);
+                        if (character.tag == "Player")
+                        {
+                            CharactersModel _Character_Actions = new CharactersModel();
+
+                            Player PlayerScript = character.GetComponent<Player>();
+
+                            if (PlayerScript.id == id)
+                            {
+                                PlayerScript.CurrentTile = CurrentTile;
+                                PlayerScript.HP = CurrentHP;
+                                PlayerScript.ActionPoints = CurrentAP;
+
+                                PlayerScript.MoveToTile();
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+
         if (GlobalVariables.WAITING_PLAYERS_TURN && GlobalVariables.IS_SERVER_READY)
         {
             GlobalVariables.IS_SERVER_READY = false;
